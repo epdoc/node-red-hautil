@@ -1,0 +1,36 @@
+{
+  "name": "node-red-utils",
+  "version": "0.0.1",
+  "description": "Node-RED utils for Home Assistant",
+  "private": false,
+  "keywords": [
+    "util",
+    "nodered",
+    "homeassistant"
+  ],
+  "license": "GNU GENERAL PUBLIC LICENSE",
+  "author": {
+    "name": "James Pravetz",
+    "email": "jpravetz@epdoc.com"
+  },
+  "main": "src/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jpravetz/hassio-node-red-utils"
+  },
+  "scripts": {
+    "watch": "jest --watch",
+    "test": "jest --runInBand",
+    "coverage": "jest --coverage --runInBand --verbose",
+    "format": "prettier --write 'src/**/*.js'"
+  },
+  "devDependencies": {
+    "jest": "^29.6.4",
+    "prettier": "^3.0.3",
+    "eslint": "^8.49.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.0"
+  },
+  "dependencies": {
+  }
+}
