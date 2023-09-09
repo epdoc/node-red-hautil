@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 const REGEX = {
   isTrue: /^true$/i,
@@ -10,58 +10,58 @@ const REGEX = {
   typeSplit: /\s*[,\|]{1}\s*/,
 };
 
-function isBoolean(val) {
+export function isBoolean(val) {
   return typeof val === 'boolean';
 }
 
-function isString(val) {
+export function isString(val) {
   return typeof val === 'string';
 }
 
-function isNumber(val) {
+export function isNumber(val) {
   return typeof val === 'number' && !isNaN(val);
 }
 
-function isInteger(val) {
+export function isInteger(val) {
   return isNumber(val) && Number.isInteger(val);
 }
 
-function isPosNumber(val) {
+export function isPosNumber(val) {
   return typeof val === 'number' && !isNaN(val) && val > 0;
 }
 
-function isNonEmptyString(val) {
+export function isNonEmptyString(val) {
   return typeof val === 'string' && val.length > 0;
 }
 
-function isFunction(val) {
+export function isFunction(val) {
   return typeof val === 'function';
 }
 
-function isDate(val) {
+export function isDate(val) {
   return val instanceof Date;
 }
 
-function isArray(val) {
+export function isArray(val) {
   return Array.isArray(val);
 }
 
-function isNonEmptyArray(val) {
+export function isNonEmptyArray(val) {
   return Array.isArray(val) && val.length > 0;
 }
 
-function isRegExp(val) {
+export function isRegExp(val) {
   return val instanceof RegExp;
 }
 
-function isNull(val) {
+export function isNull(val) {
   return val === null ? true : false;
 }
 
-function isDefined(val) {
+export function isDefined(val) {
   return val !== undefined;
 }
-function isDict(val) {
+export function isDict(val) {
   if (!isObject(val)) {
     return false;
   }
@@ -72,15 +72,15 @@ function isDict(val) {
  * Is not undefined or null.
  * @param val - The value to be tested
  */
-function hasValue(val) {
+export function hasValue(val) {
   return val !== null && val !== undefined;
 }
 
-function isEmpty(obj) {
+export function isEmpty(obj) {
   return Object.keys(obj).length === 0 && obj.constructor === Object;
 }
 
-function isError(val) {
+export function isError(val) {
   return val instanceof Error;
 }
 
@@ -88,7 +88,7 @@ function isError(val) {
  * An Object and NOT an array or Date
  * @param obj
  */
-function isObject(val) {
+export function isObject(val) {
   return (
     val !== null &&
     typeof val === 'object' &&
@@ -98,11 +98,11 @@ function isObject(val) {
   );
 }
 
-// function schemaTypeValidator(type: string) {
+// export function schemaTypeValidator(type: string) {
 //   return Util.VAL_MAP[type];
 // }
 
-function isTrue(val) {
+export function isTrue(val) {
   if (typeof val === 'number') {
     return val > 0 ? true : false;
   } else if (typeof val === 'string') {
@@ -113,7 +113,7 @@ function isTrue(val) {
   return false;
 }
 
-function isFalse(val) {
+export function isFalse(val) {
   if (typeof val === 'number') {
     return val === 0 ? true : false;
   } else if (typeof val === 'string') {
@@ -130,7 +130,7 @@ function isFalse(val) {
  * @param opts.def number
  * @param opts.commaAsDecimal boolean
  */
-function asFloat(val, opts) {
+export function asFloat(val, opts) {
   if (typeof val === 'number') {
     return val;
   }
@@ -159,7 +159,7 @@ function asFloat(val, opts) {
  * Always returns a valid integer. Returns 0 if the val cannot be parsed or rounded to an integer.
  * @param val
  */
-function asInt(val) {
+export function asInt(val) {
   // for speed do this test first
   if (isNumber(val)) {
     return Number.isInteger(val) ? val : Math.round(val);
@@ -179,7 +179,7 @@ function asInt(val) {
  * @param [z='0'] {char} character with which to pad string.
  * @returns {String}
  */
-function pad(n, width, z) {
+export function pad(n, width, z) {
   z = z ? z : '0';
   const sn = String(n);
   return sn.length >= width ? sn : new Array(width - sn.length + 1).join(z) + sn;
@@ -191,7 +191,7 @@ function pad(n, width, z) {
  * @param {number} dec - number of digits after decimal
  * @return {number} num rounded
  */
-function roundNumber(num, dec) {
+export function roundNumber(num, dec) {
   dec = isInteger(dec) ? dec : 3;
   const factor = Math.pow(10, dec);
   return Math.round(num * factor) / factor;
@@ -201,19 +201,19 @@ function roundNumber(num, dec) {
  * Convert string of form 'myClass' to 'my-class'
  * @param str
  */
-function camelToDash(str) {
+export function camelToDash(str) {
   return str
     .replace(REGEX.firstUppercase, ([first]) => first.toLowerCase())
     .replace(REGEX.allUppercase, ([letter]) => `-${letter.toLowerCase()}`);
 }
 
-function googleDate(jsDate) {
+export function googleDate(jsDate) {
   const d = new Date(jsDate);
   const tNull = new Date(Date.UTC(1899, 11, 30, 0, 0, 0, 0)); // the starting value for Google
   return ((d.getTime() - tNull.getTime()) / 60000 - d.getTimezoneOffset()) / 1440;
 }
 
-function delayPromise(ms) {
+export function delayPromise(ms) {
   return new Promise(function (resolve) {
     setTimeout(function () {
       resolve();
@@ -221,7 +221,7 @@ function delayPromise(ms) {
   });
 }
 
-function msToObj(milliseconds) {
+export function msToObj(milliseconds) {
   let result = {
     timestring: '', // for text message use
     notistring: '', // for audible message use
@@ -258,6 +258,6 @@ function msToObj(milliseconds) {
   return result;
 }
 
-function msToString(milliseconds) {
+export function msToString(milliseconds) {
   return msToObj(milliseconds).timestring;
 }

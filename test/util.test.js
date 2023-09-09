@@ -1,4 +1,27 @@
-require('../src/utils');
+import {
+  asFloat,
+  asInt,
+  camelToDash,
+  hasValue,
+  isArray,
+  isBoolean,
+  isDate,
+  isDefined,
+  isError,
+  isFunction,
+  isInteger,
+  isNonEmptyString,
+  isNull,
+  isNumber,
+  isObject,
+  isPosNumber,
+  isRegExp,
+  isString,
+  msToObj,
+  msToString,
+  pad,
+} from '../src/utils.js';
+// import * from '../src/utils.js';
 
 describe('util', () => {
   describe('type', () => {
@@ -10,17 +33,6 @@ describe('util', () => {
 
     it('isString', () => {
       expect(isString('string')).toBe(true);
-      expect(t({ a: 'string' }).property('a').isString()).toBe(true);
-      expect(
-        t({ a: { b: 'string' } })
-          .prop('a.b')
-          .isString(),
-      ).toBe(true);
-      expect(
-        t({ a: { b: 'string' } })
-          .property('a.c')
-          .isString(),
-      ).toBe(false);
       expect(isString(4)).toBe(false);
     });
 
@@ -129,38 +141,54 @@ describe('util', () => {
       expect(isError(new Error())).toBe(true);
       expect(isError(() => {})).toBe(false);
     });
+  });
 
-    describe('translate', () => {
-      it('camelToDash', () => {
-        expect(camelToDash('myStringHere')).toEqual('my-string-here');
-        expect(camelToDash('MyStringHere')).toEqual('my-string-here');
-      });
-      it('pad', () => {
-        expect(pad(32, 4)).toEqual('0032');
-        expect(pad(32, 4, 'a')).toEqual('aa32');
-        expect(pad(32, 2)).toEqual('32');
-      });
-      it('asInt', () => {
-        expect(asInt(32)).toEqual(32);
-        expect(asInt(32.5)).toEqual(33);
-        expect(asInt(9.49)).toEqual(9);
-        expect(asInt('9.49')).toEqual(9);
-        expect(asInt('11.5')).toEqual(12);
-        expect(asInt('aba')).toEqual(0);
-        expect(asInt([])).toEqual(0);
-      });
-      it('asFloat', () => {
-        expect(asFloat(32)).toEqual(32);
-        expect(asFloat(32.5)).toEqual(32.5);
-        expect(asFloat('32.5')).toEqual(32.5);
-        expect(asFloat('9.49')).toEqual(9.49);
-        expect(asFloat('11.5')).toEqual(11.5);
-        expect(asFloat('aba')).toEqual(0);
-        expect(asFloat('aba', { def: 4 })).toEqual(4);
-        expect(asFloat('32,222,456.55')).toEqual(32222456.55);
-        expect(asFloat('32.222.456,55', { commaAsDecimal: true })).toEqual(32222456.55);
-        expect(asFloat([])).toEqual(0);
-      });
+  describe('translate', () => {
+    it('camelToDash', () => {
+      expect(camelToDash('myStringHere')).toEqual('my-string-here');
+      expect(camelToDash('MyStringHere')).toEqual('my-string-here');
+    });
+    it('pad', () => {
+      expect(pad(32, 4)).toEqual('0032');
+      expect(pad(32, 4, 'a')).toEqual('aa32');
+      expect(pad(32, 2)).toEqual('32');
+    });
+    it('asInt', () => {
+      expect(asInt(32)).toEqual(32);
+      expect(asInt(32.5)).toEqual(33);
+      expect(asInt(9.49)).toEqual(9);
+      expect(asInt('9.49')).toEqual(9);
+      expect(asInt('11.5')).toEqual(12);
+      expect(asInt('aba')).toEqual(0);
+      expect(asInt([])).toEqual(0);
+    });
+    it('asFloat', () => {
+      expect(asFloat(32)).toEqual(32);
+      expect(asFloat(32.5)).toEqual(32.5);
+      expect(asFloat('32.5')).toEqual(32.5);
+      expect(asFloat('9.49')).toEqual(9.49);
+      expect(asFloat('11.5')).toEqual(11.5);
+      expect(asFloat('aba')).toEqual(0);
+      expect(asFloat('aba', { def: 4 })).toEqual(4);
+      expect(asFloat('32,222,456.55')).toEqual(32222456.55);
+      expect(asFloat('32.222.456,55', { commaAsDecimal: true })).toEqual(32222456.55);
+      expect(asFloat([])).toEqual(0);
+    });
+  });
+  describe('time', () => {
+    it('msToObj', () => {
+      const a = msToObj(1000);
+      expect(isObject(a)).toBe(true);
+      expect(a.timestring).toEqual('0:01');
+      expect(a.h).toEqual(0);
+      expect(a.s).toEqual(1);
+      const b = msToObj(123000);
+      expect(isObject(b)).toBe(true);
+      expect(b.timestring).toEqual('2:03');
+      expect(b.h).toEqual(0);
+      expect(b.s).toEqual(3);
+      expect(b.m).toEqual(2);
+      expect(msToString(3783010)).toEqual('1:03:03');
     });
   });
 });
