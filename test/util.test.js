@@ -20,7 +20,7 @@ import {
   msToObj,
   msToString,
   pad,
-} from '../src/utils.js';
+} from '../src/util.js';
 // import * from '../src/utils.js';
 
 describe('util', () => {

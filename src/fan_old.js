@@ -1,74 +1,71 @@
-import { isFunction, isObject } from './util';
+(function () {
+  require('utils');
 
-export class Fan {
-  static DELAY = [1000, 3000];
-  static PERCENTAGES = [0, 16, 33, 50, 66, 83, 100];
-  static LIMITS = [-1, 8, 25, 42, 58, 75, 92, 100];
-  bond_id;
-  fan_id;
-  switch_id;
-  warn = null;
+  let Fan = function () {
+    const DELAY = [1000, 3000];
 
-  constructor(name, options) {
-    this.bond_id = 'fan.bond_' + name;
-    this.fan_id = 'fan.' + name;
-    this.switch_id = this.fan_id;
-    this.options = isObject(options) ? options : {};
-    this.warn = isFunction(this.options.warn) ? this.options.warn : null;
-  }
-
-  static speedToPercentage(speed) {
-    let sp = speed;
-    if (speed < 1 || speed >= this.PERCENTAGES.length) {
-      sp = 2;
+    function Fan(name, options) {
+      this.bond_id = 'fan.bond_' + name;
+      this.fan_id = 'fan.' + name;
+      this.switch_id = this.fan_id;
+      this.warn = isFunction(this.options.warn) ? this.options.warn : null;
     }
-    return this.PERCENTAGES[sp];
-  }
 
-  static percentageToSpeed(percentage) {
-    for (let pdx = 0; pdx <= 6; ++pdx) {
-      if (percentage > this.LIMITS[pdx] && percentage <= this.LIMITS[pdx + 1]) {
-        return pdx;
+    Fan.prototype.speedToPercentage = function (speed) {
+      const PERCENTAGES = [0, 16, 33, 50, 66, 83, 100];
+      let sp = speed;
+      if (speed < 1 || speed >= PERCENTAGES.length) {
+        sp = 2;
       }
-    }
-    return 0;
-  }
-
-  speed(speed) {
-    return {
-      entity_id: this.bond_id,
-      percentage: Fan.speedToPercentage(speed),
+      return PERCENTAGES[sp];
     };
-  }
 
-  toServicePayload(service) {
-    return {
-      domain: 'fan',
-      service: 'turn_' + service,
-      target: {
+    Fan.prototype.percentageToSpeed = function (percentage) {
+      const LIMITS = [-1, 8, 25, 42, 58, 75, 92, 100];
+      for (let pdx = 0; pdx <= 6; ++pdx) {
+        if (percentage > LIMITS[pdx] && percentage <= LIMITS[pdx + 1]) {
+          return pdx;
+        }
+      }
+      return 0;
+    };
+
+    Fan.prototype.speed = function (speed) {
+      return {
         entity_id: this.bond_id,
-      },
+        percentage: this.fanSpeedToPercentage(speed),
+      };
     };
-  }
 
-  toSpeedPayload(speed) {
-    return {
-      domain: 'fan',
-      service: 'set_percentage',
-      target: {
-        entity_id: this.bond_id,
-      },
-      data: {
-        percentage: Fan.speedToPercentage(speed),
-      },
+    Fan.prototype.toServicePayload = function (service) {
+      return {
+        domain: 'fan',
+        service: 'turn_' + service,
+        target: {
+          entity_id: this.bond_id,
+        },
+      };
     };
-  }
 
-  callServices(service, speed, timeout, cb) {
-    const bOn = service === 'on';
-    const bOff = service === 'off';
-  }
-}
+    Fan.prototype.toSpeedPayload = function (speed) {
+      return {
+        domain: 'fan',
+        service: 'set_percentage',
+        target: {
+          entity_id: this.bond_id,
+        },
+        data: {
+          percentage: this.fanSpeedToPercentage(speed),
+        },
+      };
+    };
+
+    Fan.prototype.callServices(service, speed, timeout, cb) {
+      const bOn = service === 'on';
+      const bOff = service === 'off';
+        }
+  };
+});
 
 // returns a promise
 /**
@@ -77,7 +74,7 @@ export class Fan {
  * speed - (optional, int) A number from 0 to 6. 0 will turn off the fan via the switch.
  * timeout - (optional, ms) If set, and service is 'on', the fan will be turned off after this amount of time.
  */
-export function setFan(fan, service, speed, timeout, cb) {
+ function setFan(fan, service, speed, timeout, cb) {
   // const switch_id = "switch." + fan + "_fan_switch";
   const DELAY = [1000, 3000];
   const fan_id = 'fan.' + fan;
