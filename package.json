@@ -13,20 +13,25 @@
     "name": "James Pravetz",
     "email": "jpravetz@epdoc.com"
   },
-  "main": "src/index.js",
+  "main": "lib/index.js",
   "type": "module",
   "repository": {
     "type": "git",
     "url": "https://github.com/jpravetz/hassio-node-red-utils"
   },
   "scripts": {
+    "build": "babel src --out-dir lib",
     "watch": "jest --watch",
     "test": "jest --runInBand",
     "coverage": "jest --coverage --runInBand --verbose",
     "format": "prettier --write 'src/**/*.js'"
   },
   "devDependencies": {
+    "@babel/cli": "^7.22.15",
+    "@babel/core": "^7.22.17",
     "@babel/plugin-transform-modules-commonjs": "^7.22.15",
+    "@babel/preset-env": "^7.22.15",
+    "babel": "^6.23.0",
     "eslint": "^8.49.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",
