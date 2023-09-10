@@ -1,6 +1,6 @@
 {
   "name": "node-red-utils",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Node-RED utils for Home Assistant",
   "private": false,
   "keywords": [
