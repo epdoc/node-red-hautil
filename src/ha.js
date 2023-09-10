@@ -1,19 +1,27 @@
+import { isFunction } from 'epdoc-util';
 import { Fan } from './fan';
-import { isFunction } from './util';
+
+export function newHA(globalHomeAssistant, options) {
+  return new HA(globalHomeAssistant, options);
+}
 
 export class HA {
-  ha;
-  options;
-  log;
+  _ha;
+  _options;
+  _log;
 
   constructor(globalHomeAssistant, options) {
-    this.ha = globalHomeAssistant.homeAssistant;
-    this.options = options || {};
-    this.log = isFunction(this.options.log) ? this.options.log : null;
+    this._ha = globalHomeAssistant.homeAssistant;
+    this._options = options || {};
+    this._log = isFunction(this._options.log) ? this._options.log : null;
+  }
+
+  get ha() {
+    return this._ha;
   }
 
   isEntityOn(entity_id) {
-    const entity = this.ha.states[entity_id];
+    const entity = this._ha.states[entity_id];
     return entity && entity.state === 'on' ? true : false;
   }
 

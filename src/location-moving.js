@@ -1,29 +1,36 @@
-(function () {
-  require('util');
+export function newLocationMoving(person, history, oldLocation, newLocation) {
+  return new LocationMoving(person, history, oldLocation, newLocation);
+}
 
-  let LocationMoving = function () {
-    function LocationMoving(person, history, oldLocation, newLocation) {
-      this.person = person;
-      this.history = history;
-      this.newLocation = newLocation;
-    }
+export class LocationMoving {
+  person;
+  history;
+  oldLocation;
+  newLocation;
 
-    LocationMoving.prototype.moving = function (locations, tCutoffMs) {
-      let result = false;
-      for (let ldx = locations.length - 1; ldx >= 0 && !result; --ldx) {
-        if (this.newLocation === locations[ldx]) {
-          const before = locations.slice(0, ldx);
-          if (before.find(this.oldLocation)) {
-            result = true;
-          } else {
-            for (let bdx = 0; bdx < before.length - 1 && !result; ++bdx) {
-              if (this.history.find(this.person, tCutoffMs, before[bdx])) {
-                result = true;
-              }
+  constructor(person, history, oldLocation, newLocation) {
+    this.person = person;
+    this.history = history;
+    this.oldLocation = oldLocation;
+    this.newLocation = newLocation;
+  }
+
+  moving(locations, tCutoffMs) {
+    let result = false;
+    for (let ldx = locations.length - 1; ldx >= 0 && !result; --ldx) {
+      if (this.newLocation === locations[ldx]) {
+        const before = locations.slice(0, ldx);
+        if (before.find(this.oldLocation)) {
+          result = true;
+        } else {
+          for (let bdx = 0; bdx < before.length - 1 && !result; ++bdx) {
+            if (this.history.find(this.person, tCutoffMs, before[bdx])) {
+              result = true;
             }
           }
         }
       }
-    };
-  };
-});
+    }
+    return result;
+  }
+}

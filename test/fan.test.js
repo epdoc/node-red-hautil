@@ -1,5 +1,5 @@
+import { isObject } from 'epdoc-util';
 import { Fan } from '../src/fan.js';
-import { isObject } from '../src/util.js';
 
 describe('speed', () => {
   describe('conversion', () => {

@@ -1,4 +1,8 @@
-import { isFunction, isObject } from './util';
+import { isFunction, isObject } from "epdoc-util";
+
+export function newFan(name,options) {
+  return new Fan(name,options);
+}
 
 export class Fan {
   static DELAY = [1000, 3000];
@@ -13,8 +17,8 @@ export class Fan {
     this.bond_id = 'fan.bond_' + name;
     this.fan_id = 'fan.' + name;
     this.switch_id = this.fan_id;
-    this.options = isObject(options) ? options : {};
-    this.warn = isFunction(this.options.warn) ? this.options.warn : null;
+    this.options = isObject (options) ? options : {};
+    this.warn = isFunction (this.options.warn) ? this.options.warn : null;
   }
 
   static speedToPercentage(speed) {

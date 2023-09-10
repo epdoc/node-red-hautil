@@ -1,5 +1,5 @@
+import { isObject } from 'epdoc-util';
 import { HA } from '../src/ha.js';
-import { isObject } from '../src/util.js';
 
 describe('ha', () => {
   describe('entity data', () => {
@@ -27,7 +27,7 @@ describe('ha', () => {
         e2: { id: 'entity2' },
       };
       ha.retrieveSensorsData(dict);
-      expect(isObject(dict.e1.obj)).toEqual(true);
+      expect(isObject (dict.e1.obj)).toEqual(true);
       expect(isObject(dict.e2.obj)).toEqual(true);
       expect(dict.e2.state).toEqual('on');
       expect(dict.e1.state).toEqual('off');
