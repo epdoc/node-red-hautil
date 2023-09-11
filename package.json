@@ -14,13 +14,12 @@
     "email": "jpravetz@epdoc.com"
   },
   "main": "lib/index.js",
-  "type": "module",
   "repository": {
     "type": "git",
     "url": "https://github.com/jpravetz/hassio-node-red-utils"
   },
   "scripts": {
-    "build": "babel src --out-file lib/index.js",
+    "build": "babel src --out-dir lib",
     "watch": "jest --watch",
     "test": "jest --runInBand",
     "coverage": "jest --coverage --runInBand --verbose",

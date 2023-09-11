@@ -1,5 +1,5 @@
 import { isObject } from 'epdoc-util';
-import { HA } from '../src/ha.js';
+import { HA } from '../src';
 
 describe('ha', () => {
   describe('entity data', () => {

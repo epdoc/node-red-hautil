@@ -1,5 +1,5 @@
 import { isObject } from 'epdoc-util';
-import { Fan } from '../src/fan.js';
+import { Fan } from '../src';
 
 describe('speed', () => {
   describe('conversion', () => {
@@ -41,7 +41,7 @@ describe('speed', () => {
     });
     it('speed payload', () => {
       const fan = new Fan('master_bedroom');
-      const result = fan.toSpeedPayload(4);
+      const result = fan.toSpeedServicePayload(4);
       expect(isObject(result)).toEqual(true);
       expect(isObject(result.target)).toEqual(true);
       expect(isObject(result.data)).toEqual(true);
