@@ -1,5 +1,5 @@
 import { isDate } from 'epdoc-util';
-import { googleDate, msToObj } from '../src';
+import { delayPromise, googleDate, msToObj } from '../src';
 
 describe('util', () => {
   describe('googleDate', () => {
@@ -51,6 +51,33 @@ describe('util', () => {
         h: 0,
         d: 0,
       });
+    });
+    it('more', () => {
+      let r = msToObj(11523492);
+      expect(r).toEqual({
+        timestring: '3:12:03',
+        notistring: '3 hours 12 minutes 3 seconds',
+        s: 3,
+        m: 12,
+        h: 3,
+        d: 0,
+      });
+    });
+  });
+  describe('delayPromise', () => {
+    it('50 ms', () => {
+      let tStart = 0;
+      return Promise.resolve()
+        .then((resp) => {
+          tStart = new Date().getTime();
+          return delayPromise(50);
+        })
+        .then((resp) => {
+          let diff = new Date().getTime() - tStart;
+          expect(diff).toBeGreaterThanOrEqual(50);
+          expect(diff).toBeLessThanOrEqual(60);
+          return Promise.resolve();
+        });
     });
   });
 });
