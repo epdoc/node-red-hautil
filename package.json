@@ -1,6 +1,6 @@
 {
   "name": "node-red-utils",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Node-RED utils for Home Assistant",
   "private": false,
   "keywords": [
@@ -20,7 +20,7 @@
     "url": "https://github.com/jpravetz/hassio-node-red-utils"
   },
   "scripts": {
-    "build": "babel src --out-dir lib",
+    "build": "babel src --out-file lib/index.js",
     "watch": "jest --watch",
     "test": "jest --runInBand",
     "coverage": "jest --coverage --runInBand --verbose",
