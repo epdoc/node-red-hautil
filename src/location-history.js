@@ -1,4 +1,4 @@
-import { isArray, isFunction, isNonEmptyArray } from 'epdoc-util';
+import { deepCopy, isArray, isFunction, isNonEmptyArray } from 'epdoc-util';
 
 export function newLocationHistory(options) {
   return new LocationHistory(options);
@@ -10,7 +10,6 @@ export class LocationHistory {
   dirty = false;
   getStorage = null;
   setStorage = null;
-  state = {};
 
   constructor(options) {
     this.GATE_HISTORY = 'gate_history';
@@ -49,8 +48,14 @@ export class LocationHistory {
     return this;
   }
 
+  /**
+   * Return a HistoryFilter object that can be used to filter location history for this person
+   * @param {string} person
+   * @returns
+   */
+
   filter(person) {
-    return this.person(person);
+    return new HistoryFilter(person, isArray(this.history[person]) ? this.history[person] : []);
   }
 
   /**
@@ -61,8 +66,7 @@ export class LocationHistory {
    * @returns Array of objects containing matches { location, time: ms }
    */
   person(person) {
-    this.state = new HistoryFilter(person, isArray(this.history[person]) ? this.history[person] : []);
-    return this.state;
+    return this.filter(person);
   }
 
   prune(tCutoff) {
@@ -126,9 +130,14 @@ class HistoryFilter {
 
   constructor(person, items) {
     this._person = person;
-    this._items = items;
+    this._items = deepCopy(items);
   }
 
+  /**
+   * Filters out all history items that were set prior to this time.
+   * @param {ms} tCutoffMs ms from UNIX epoch.
+   * @returns self
+   */
   cutoff(tCutoffMs) {
     this._tCutoffMs = tCutoffMs;
     if (isNonEmptyArray(this._items)) {
@@ -144,9 +153,14 @@ class HistoryFilter {
     return this;
   }
 
+  /**
+   * Filter out all history items that are not at the specified locations.
+   * @param {array of strings} locations A string or array of strings.
+   * @returns self
+   */
   locations(locations) {
     this._locations = isArray(locations) ? locations : [locations];
-    if (isNonEmptyArray(this._items)) {
+    if (isNonEmptyArray(this._items) && isNonEmptyArray(this._locations)) {
       let newItems = [];
       for (let ldx = 0; ldx < this._locations.length; ++ldx) {
         const location = this._locations[ldx];
@@ -162,6 +176,11 @@ class HistoryFilter {
     return this;
   }
 
+  /**
+   * Sorts the history items to be in the same order as they appear in the
+   * previous call to locations().
+   * @returns self
+   */
   sortByLocation() {
     if (isNonEmptyArray(this._locations) && isNonEmptyArray(this._items) && this._items.length > 1) {
       this._items.sort((a, b) => {
@@ -173,14 +192,26 @@ class HistoryFilter {
     return this;
   }
 
+  /**
+   *
+   * @returns true if there are filtered items remaining
+   */
   found() {
     return isNonEmptyArray(this._items);
   }
 
+  /**
+   *
+   * @returns The number of filtered items remaining.
+   */
   numFound() {
     return this.found() ? this._items.length : 0;
   }
 
+  /**
+   * Evaluate whether the history items are ordered by time
+   * @returns boolean Returns true if ordered by time.
+   */
   orderedByTime() {
     let result = false;
     if (isNonEmptyArray(this._items) && this._items.length > 1) {
@@ -194,10 +225,22 @@ class HistoryFilter {
     return result;
   }
 
+  /**
+   * Determines if the person is moving in the direction of locations(), which
+   * should have been called earlier. Will sort entries by location and
+   * determine if they are ordered by time in the appropriate direction.
+   * @returns true if moving in the direction given by the call to locations().
+   */
   moving() {
     return this.sortByLocation().orderedByTime();
   }
 
+  /**
+   * Generates a JSON string that displays time as milliseconds from tNow.
+   * @param {ms} tNow (optional) The reference time. Will be set to now if not
+   * provided
+   * @returns a JSON stringified array of history locations and times.
+   */
   toString(tNow) {
     tNow = tNow ? tNow : new Date().getTime();
     let result = [];

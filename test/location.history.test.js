@@ -39,28 +39,28 @@ describe('LocationHistory', () => {
     it('add and find', () => {
       history.add('bob', g(0), tNow - 5000);
       let f = history
-        .person('bob')
+        .filter('bob')
         .cutoff(tNow - 10000)
         .locations([g(0), g(1), g(2)]);
       expect(f.found()).toEqual(true);
       expect(f.numFound()).toEqual(1);
       f = history
-        .person('andy')
+        .filter('andy')
         .cutoff(tNow - 10000)
         .locations([g(0), g(1), g(2)]);
       expect(f.numFound()).toEqual(0);
       f = history
-        .person('bob')
+        .filter('bob')
         .cutoff(tNow - 4000)
         .locations([g(0), g(1), g(2)]);
       expect(f.numFound()).toEqual(0);
       f = history
-        .person('bob')
+        .filter('bob')
         .cutoff(tNow - 5500)
         .locations([g(0), g(1), g(2)]);
       expect(f.numFound()).toEqual(1);
       f = history
-        .person('bob')
+        .filter('bob')
         .cutoff(tNow - 5500)
         .locations([g(1), g(2)]);
       expect(f.numFound()).toEqual(0);
@@ -69,7 +69,7 @@ describe('LocationHistory', () => {
     });
     it('moving one location fail', () => {
       let f = history
-        .person('bob')
+        .filter('bob')
         .cutoff(tNow - 20000)
         .locations([g(0), g(1)]);
       expect(f.found()).toEqual(true);
@@ -90,7 +90,7 @@ describe('LocationHistory', () => {
     });
     it('moving two location pass', () => {
       let f = history
-        .person('bob')
+        .filter('bob')
         .cutoff(tNow - 20000)
         .locations([g(0), g(1)]);
       expect(f.moving()).toEqual(true);
@@ -98,21 +98,21 @@ describe('LocationHistory', () => {
     });
     it('moving two location fail', () => {
       let f = history
-        .person('bob')
+        .filter('bob')
         .cutoff(tNow - 20000)
         .locations([g(1), g(0)]);
       expect(f.moving()).toEqual(false);
     });
     it('moving two location short cutoff', () => {
       let f = history
-        .person('bob')
+        .filter('bob')
         .cutoff(tNow + 5500)
         .locations([g(0), g(1)]);
       expect(f.moving()).toEqual(false);
     });
     it('moving two location wrong order', () => {
       let f = history
-        .person('bob')
+        .filter('bob')
         .cutoff(tNow - 20000)
         .locations([g(1), g(0)]);
       expect(f.moving()).toEqual(false);
@@ -120,7 +120,7 @@ describe('LocationHistory', () => {
     it('find more', () => {
       expect(history.history['bob'].length).toEqual(2);
       let f = history
-        .person('bob')
+        .filter('bob')
         .cutoff(tNow - 10000)
         .locations([g(0)]);
       expect(f.numFound()).toEqual(1);
@@ -139,14 +139,14 @@ describe('LocationHistory', () => {
     it('prune nothing', () => {
       history.prune(tNow + 3000);
       let f = history
-        .person('bob')
+        .filter('bob')
         .cutoff(tNow - 10000)
         .locations([g(0)]);
       expect(f.numFound()).toEqual(1);
       f.locations(g(1));
       expect(f.numFound()).toEqual(0);
       f = history
-        .person('bob')
+        .filter('bob')
         .cutoff(tNow - 10000)
         .locations(g(1));
       expect(f.numFound()).toEqual(1);
@@ -160,7 +160,7 @@ describe('LocationHistory', () => {
     it('prune one', () => {
       history.prune(tNow + 4500);
       let f = history
-        .person('bob')
+        .filter('bob')
         .cutoff(tNow - 10000)
         .locations([g(0), g(1)]);
       expect(f.numFound()).toEqual(1);
@@ -192,12 +192,12 @@ describe('LocationHistory', () => {
       history.read();
       expect(db.gate_history.bob).toHaveLength(2);
       let f = history
-        .person('bob')
+        .filter('bob')
         .cutoff(tNow - 10000)
         .locations([g(1)]);
       expect(f.numFound()).toEqual(1);
       f = history
-        .person('bob')
+        .filter('bob')
         .cutoff(tNow - 10000)
         .locations(g(2));
       expect(f.numFound()).toEqual(1);
