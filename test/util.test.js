@@ -1,7 +1,14 @@
 import { isDate } from 'epdoc-util';
-import { delayPromise, googleDate, msToObj } from '../src';
+import pkg from '../package.json';
+import { delayPromise, googleDate, msToObj, version } from '../src';
 
 describe('util', () => {
+  describe('version', () => {
+    it('version', () => {
+      let r = version();
+      expect(r).toBe(pkg.version);
+    });
+  });
   describe('googleDate', () => {
     it('js origin date', () => {
       let d = new Date(0);
