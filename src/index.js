@@ -1,6 +1,6 @@
 import pkg from '../package.json';
 
-export * from './fan.js';
+export * from './service.js';
 export * from './ha.js';
 export * from './location-history.js';
 export * from './util.js';

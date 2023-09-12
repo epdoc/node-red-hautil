@@ -20,10 +20,21 @@ export class HA {
     return this._ha;
   }
 
+  getEntity(entity_id) {
+    return this._ha.states[entity_id];
+  }
+
   isEntityOn(entity_id) {
-    const entity = this._ha.states[entity_id];
+    const entity = this.getEntity(entity_id)
     return entity && entity.state === 'on' ? true : false;
   }
+
+  getEntitySpeed(entity_id) {
+    const entity = this.getEntity(entity_id)
+    // debug && node.warn(entity_id + " = " + JSON.stringify(entity));
+    return entity && entity.attributes ? entity.attributes.percentage : null;
+  }
+
 
   /**
    *
