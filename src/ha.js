@@ -1,5 +1,5 @@
 import { isFunction } from 'epdoc-util';
-import { Fan } from './fan';
+import { Service } from './service';
 
 export function newHA(globalHomeAssistant, options) {
   return new HA(globalHomeAssistant, options);
@@ -25,16 +25,15 @@ export class HA {
   }
 
   isEntityOn(entity_id) {
-    const entity = this.getEntity(entity_id)
+    const entity = this.getEntity(entity_id);
     return entity && entity.state === 'on' ? true : false;
   }
 
   getEntitySpeed(entity_id) {
-    const entity = this.getEntity(entity_id)
+    const entity = this.getEntity(entity_id);
     // debug && node.warn(entity_id + " = " + JSON.stringify(entity));
     return entity && entity.attributes ? entity.attributes.percentage : null;
   }
-
 
   /**
    *
@@ -75,7 +74,7 @@ export class HA {
       if (params.service === 'speed') {
         p.service = 'set_percentage';
         p.data = {
-          percentage: Fan.speedToPercentage(params.speed),
+          percentage: Service.fanSpeedToPercentage(params.speed),
         };
       } else if (p.service === 'percentage') {
         p.data = {

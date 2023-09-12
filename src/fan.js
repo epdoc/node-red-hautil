@@ -1,95 +1,117 @@
 // returns a promise
 
-import { HA } from "./ha";
-import {  newService } from "./service";
-import { delayPromise } from "./util";
+import { isInteger } from 'epdoc-util';
+import { HA } from './ha';
+import { newService } from './service';
+import { delayPromise } from './util';
 
 /**
- * fan - (required, string) short name of the fan (e.g. 'master_bedroom')
- * service - (optional, string) If set, then 'on' or 'off'
- * speed - (optional, int) A number from 0 to 6. 0 will turn off the fan via the switch.
- * timeout - (optional, ms) If set, and service is 'on', the fan will be turned off after this amount of time.
+ * Parameters:
+ *  fan - (required, string) short name of the fan (e.g. 'master_bedroom')
+ *  cmd - (required) One of 'on', 'off' or a number from 0 to 6.
+ *  opts.timeout - (optional, ms) If set, and service is 'on', the fan will be turned off after this amount of time.
+ *  opts.log - Function takes a msg and returns a promise
  */
-export function setFan(gHA,fan, service, speed, timeout, cb) {
+export function setFan(gHA, cb, fan, cmd, opts) {
   // const switch_id = "switch." + fan + "_fan_switch";
   const DELAY = [1000, 3000];
   const fan_id = 'fan.' + fan;
   const switch_id = fan_id;
+  const log = opts.log
+    ? opts.log
+    : (msg) => {
+        return Promise.resolve();
+      };
+  const speed = isInteger(cmd) ? cmd : 0;
 
-  const ha = new HA (gHA);
+  const ha = new HA(gHA);
 
-  const currentPct = ha.getEntitySpeed(fan_id);
+  // const currentPct = ha.getEntitySpeed(fan_id);
   const bLightning = ha.isEntityOn('input_boolean.lightning');
   const bEntityOn = ha.isEntityOn(switch_id);
 
-  const bOn = service === 'on';
-  const bOff = service === 'off';
+  const bOn = cmd === 'on';
+  const bOff = cmd === 'off';
 
   let bTurnedOn = false;
 
-  debug && node.warn(switch_id + ' is ' + bEntityOn);
-  debug && node.warn('lightning is ' + bLightning);
-
   return Promise.resolve()
-    .then(function () {
-      if (bEntityOn && (bLightning || bOff || (!bOn && speed === 0))) {
-        debug && node.warn('Turn off ' + switch_id);
-        msg.payload = newService (switch_id).service('off').payload();
-        cb(msg);
-      }
-      return Promise.resolve();
+    .then((resp) => {
+      return log(`${switch_id} is ${bEntityOn}`).then((resp) => {
+        return log(`lightning is ${bLightning}`);
+      });
     })
     .then(function () {
-      if (!bEntityOn && !bLightning && (bOn || speed > 0)) {
-        debug && node.warn('Turn on ' + switch_id);
-        msg.payload = newService (switch_id).service('on').payload();
-        cb(msg);
-        bTurnedOn = true;
+      if (bEntityOn && (bLightning || bOff || (!bOn && opts.speed === 0))) {
+        return log(`Turn off ${fan_id}`).then((resp) => {
+          let payload = newService(fan_id).service('off').payload();
+          return cb(payload);
+        });
+      } else {
+        return log(`Leave on ${fan_id}`);
       }
-      return Promise.resolve();
+    })
+    .then(function () {
+      if (!bEntityOn && !bLightning && (bOn || opts.speed > 0)) {
+        return log('Turn on ' + switch_id)
+          .then((resp) => {
+            let payload = newService(switch_id).service('on').payload();
+            return cb(payload);
+          })
+          .then((resp) => {
+            bTurnedOn = true;
+          });
+      } else {
+        return log(`Already on ${fan_id}`);
+      }
     })
     .then(function () {
       if (!bLightning && speed > 0 && bTurnedOn) {
-        debug && node.warn('1st delay of ' + DELAY[0] + ' for ' + switch_id);
-        return delayPromise(DELAY[0])
+        return log('1st delay of ' + DELAY[0] + ' for ' + switch_id).then((resp) => {
+          return delayPromise(DELAY[0]);
+        });
       }
       return Promise.resolve();
     })
     .then(function () {
       if (!bLightning && speed > 0) {
-        debug && node.warn('1st set fan speed to ' + speed + ' for ' + fan_id);
-        msg.payload = newService(fan_id).speed(speed).payload();
-        cb(msg);
+        return log('1st set fan speed to ' + speed + ' for ' + fan_id).then((resp) => {
+          let payload = newService(fan_id).speed(speed).payload();
+          return cb(payload);
+        });
+      } else {
+        return log(`Skipping set speed step for ${fan_id}`);
       }
-      return Promise.resolve();
     })
     .then(function () {
       if (!bLightning && speed > 0) {
-        debug && node.warn('2nd delay of ' + DELAY[1] + ' for ' + switch_id);
-        return delayPromise(DELAY[1]);
+        return log('2nd delay of ' + DELAY[1] + ' for ' + switch_id).then((resp) => {
+          return delayPromise(DELAY[1]);
+        });
+      } else {
+        return log(`Skipping first delay for ${fan_id}`);
       }
-      return Promise.resolve();
     })
     .then(function () {
       if (!bLightning && speed > 0) {
-        debug && node.warn('2nd set fan speed to ' + speed + ' for ' + fan_id);
-        msg.payload = newService(fan_id).speed(speed).payload();
-        cb(msg);
+        log && log('2nd set fan speed to ' + speed + ' for ' + fan_id);
+        let payload = newService(fan_id).speed(speed).payload();
+        return cb(payload);
       }
       return Promise.resolve();
     })
     .then(function () {
-      if (bOn && timeout && !bLightning) {
-        debug && node.warn('timeout ' + timeout + ' for ' + switch_id);
-        return delayPromise(timeout);
+      if (bOn && opts.timeout && !bLightning) {
+        log && log(`timeout ${opts.timeout} for ${switch_id}`);
+        return delayPromise(opts.timeout);
       }
       return Promise.resolve();
     })
     .then(function () {
-      if (bOn && timeout && !bLightning) {
-        debug && node.warn('timeout turn off for ' + switch_id);
-        msg.payload = newService (switch_id).service('off').payload();
-        cb(msg);
+      if (bOn && opts.timeout && !bLightning) {
+        log && log('timeout turn off for ' + switch_id);
+        let payload = newService(switch_id).service('off').payload();
+        return cb(payload);
       }
       return Promise.resolve();
     });
