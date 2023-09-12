@@ -49,6 +49,10 @@ export class LocationHistory {
     return this;
   }
 
+  filter(person) {
+    return this.person(person);
+  }
+
   /**
    * Find the person at any one of the locations, after the time defined by tCutoff
    * @param {} person
@@ -57,93 +61,26 @@ export class LocationHistory {
    * @returns Array of objects containing matches { location, time: ms }
    */
   person(person) {
-    this.state = {
-      person: person,
-      items: isArray(this.history[person]) ? this.history[person] : [],
-    };
-    return this;
+    this.state = new HistoryFilter(person, isArray(this.history[person]) ? this.history[person] : []);
+    return this.state;
   }
 
-  cutoff(tCutoffMs) {
-    this.state.tCutoffMs = tCutoffMs;
-    if (isNonEmptyArray(this.state.items)) {
+  prune(tCutoff) {
+    Object.keys(this.history).forEach((key) => {
+      const items = this.history[key];
       let newItems = [];
-      for (let idx = 0; idx < this.state.items.length; ++idx) {
-        const item = this.state.items[idx];
-        if (tCutoffMs < item.time) {
-          newItems.push(item);
-        }
-      }
-      this.state.items = newItems;
-    }
-    return this;
-  }
-
-  locations(locations) {
-    this.state.locations = isArray(locations) ? locations : [locations];
-    if (isNonEmptyArray(this.state.items)) {
-      let newItems = [];
-      for (let ldx = 0; ldx < locations.length; ++ldx) {
-        const location = locations[ldx];
-        for (let idx = 0; idx < this.state.items.length; ++idx) {
-          const item = this.state.items[idx];
-          if (location === item.location) {
+      if (isArray(items)) {
+        for (let idx = 0; idx < items.length; ++idx) {
+          const item = items[idx];
+          if (tCutoff < item.time) {
             newItems.push(item);
           }
         }
       }
-      this.state.items = newItems;
-    }
-    return this;
-  }
-
-  sortByLocation() {
-    if (isNonEmptyArray(this.state.locations) && isNonEmptyArray(this.state.items)) {
-      this.state.items.sort((a, b) => {
-        let adx = this.state.locations.indexOf(a.location);
-        let bdx = this.state.locations.indexOf(b.location);
-        return adx < bdx ? -1 : bdx < adx ? 1 : 0;
-      });
-    }
-    return this;
-  }
-
-  found() {
-    return this.state && isNonEmptyArray(this.state.items);
-  }
-
-  numFound() {
-    return this.found() ? this.state.items.length : 0;
-  }
-
-  orderedByTime() {
-    let result = false;
-    if (isNonEmptyArray(this.state.items)) {
-      result = true;
-      for (let mdx = 0; mdx < this.state.items.length - 1; ++mdx) {
-        if (this.state.items[mdx].time > this.state.items[mdx + 1].time) {
-          return false;
-        }
+      if (!isArray(items) || newItems.length !== items.length) {
+        this.history[key] = newItems;
+        this.dirty = true;
       }
-    }
-    return result;
-  }
-
-  moving() {
-    return this.sortByLocation().orderedByTime();
-  }
-
-  _prune() {
-    if (this.state.items.length !== this.history[this.state.person]) {
-      this.dirty = true;
-      this.history[this.state.person] = this.state.items;
-    }
-    return this;
-  }
-
-  pruneAll(tCutoffMs) {
-    Object.keys(this.history).forEach((person) => {
-      this.person(person).cutoff(tCutoffMs)._prune();
     });
     return this;
   }
@@ -158,22 +95,117 @@ export class LocationHistory {
     return this;
   }
 
-  toString() {
+  toString(tNow) {
+    tNow = tNow ? tNow : new Date().getTime();
     let result = {};
     Object.keys(this.history).forEach((key) => {
       const items = this.history[key];
       result[key] = [];
       if (isArray(items)) {
         for (let idx = 0; idx < items.length; ++idx) {
-          const item = items[idx];
-          const newItem = {
-            location: item.location,
-            time: new Date(item.time).toLocaleTimeString(),
-          };
-          result[key].push(newItem);
+          result[key].push(LocationHistory._itemToString(items[idx], tNow));
         }
       }
     });
     return JSON.stringify(result);
+  }
+
+  static _itemToString(item, tNow) {
+    return {
+      location: item.location,
+      time: item.time - tNow,
+    };
+  }
+}
+
+class HistoryFilter {
+  _person;
+  _items = [];
+  _locations;
+  _tCutoffMs;
+
+  constructor(person, items) {
+    this._person = person;
+    this._items = items;
+  }
+
+  cutoff(tCutoffMs) {
+    this._tCutoffMs = tCutoffMs;
+    if (isNonEmptyArray(this._items)) {
+      let newItems = [];
+      for (let idx = 0; idx < this._items.length; ++idx) {
+        const item = this._items[idx];
+        if (this._tCutoffMs < item.time) {
+          newItems.push(item);
+        }
+      }
+      this._items = newItems;
+    }
+    return this;
+  }
+
+  locations(locations) {
+    this._locations = isArray(locations) ? locations : [locations];
+    if (isNonEmptyArray(this._items)) {
+      let newItems = [];
+      for (let ldx = 0; ldx < this._locations.length; ++ldx) {
+        const location = this._locations[ldx];
+        for (let idx = 0; idx < this._items.length; ++idx) {
+          const item = this._items[idx];
+          if (location === item.location) {
+            newItems.push(item);
+          }
+        }
+      }
+      this._items = newItems;
+    }
+    return this;
+  }
+
+  sortByLocation() {
+    if (isNonEmptyArray(this._locations) && isNonEmptyArray(this._items) && this._items.length > 1) {
+      this._items.sort((a, b) => {
+        let adx = this._locations.indexOf(a.location);
+        let bdx = this._locations.indexOf(b.location);
+        return adx < bdx ? -1 : bdx < adx ? 1 : 0;
+      });
+    }
+    return this;
+  }
+
+  found() {
+    return isNonEmptyArray(this._items);
+  }
+
+  numFound() {
+    return this.found() ? this._items.length : 0;
+  }
+
+  orderedByTime() {
+    let result = false;
+    if (isNonEmptyArray(this._items) && this._items.length > 1) {
+      result = true;
+      for (let mdx = 0; mdx < this._items.length - 1; ++mdx) {
+        if (this._items[mdx].time > this._items[mdx + 1].time) {
+          return false;
+        }
+      }
+    }
+    return result;
+  }
+
+  moving() {
+    return this.sortByLocation().orderedByTime();
+  }
+
+  toString(tNow) {
+    tNow = tNow ? tNow : new Date().getTime();
+    let result = [];
+    if (isArray(this._items)) {
+      for (let idx = 0; idx < this._items.length; ++idx) {
+        result.push(LocationHistory._itemToString(this._items[idx], tNow));
+      }
+    }
+    return `(${this._person}) ` + JSON.stringify(result);
   }
 }
