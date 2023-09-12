@@ -1,4 +1,4 @@
-import { isArray, isFunction } from 'epdoc-util';
+import { isArray, isFunction, isNonEmptyArray } from 'epdoc-util';
 
 export function newLocationHistory(options) {
   return new LocationHistory(options);
@@ -10,6 +10,7 @@ export class LocationHistory {
   dirty = false;
   getStorage = null;
   setStorage = null;
+  state = {};
 
   constructor(options) {
     this.GATE_HISTORY = 'gate_history';
@@ -53,52 +54,96 @@ export class LocationHistory {
    * @param {} person
    * @param {*} tCutoff date (ms)
    * @param {*} locations Individual or array of location names
-   * @returns
+   * @returns Array of objects containing matches { location, time: ms }
    */
-  find(person, tCutoff, locations) {
-    locations = isArray(locations) ? locations : [locations];
-    const items = this.history[person];
-    let result = false;
-    if (isArray(items)) {
-      for (let idx = 0; idx < items.length && !result; ++idx) {
-        const item = items[idx];
-        this.warn &&
-          this.warn(`Entry: (${item.location}, ${new Date(item.time).toLocaleTimeString()})`);
-        for (let ldx = 0; ldx < locations.length && !result; ++ldx) {
-          const location = locations[ldx];
-          this.warn &&
-            this.warn(
-              `Testing (${item.location}, ${new Date(
-                item.time,
-              ).toLocaleTimeString()}) against location ${location} cutoff ${new Date(
-                tCutoff,
-              ).toLocaleTimeString()}.`,
-            );
-          if (item.location === location && tCutoff < item.time) {
-            result = true;
+  person(person) {
+    this.state = {
+      person: person,
+      items: isArray(this.history[person]) ? this.history[person] : [],
+    };
+    return this;
+  }
+
+  cutoff(tCutoffMs) {
+    this.state.tCutoffMs = tCutoffMs;
+    if (isNonEmptyArray(this.state.items)) {
+      let newItems = [];
+      for (let idx = 0; idx < this.state.items.length; ++idx) {
+        const item = this.state.items[idx];
+        if (tCutoffMs < item.time) {
+          newItems.push(item);
+        }
+      }
+      this.state.items = newItems;
+    }
+    return this;
+  }
+
+  locations(locations) {
+    this.state.locations = isArray(locations) ? locations : [locations];
+    if (isNonEmptyArray(this.state.items)) {
+      let newItems = [];
+      for (let ldx = 0; ldx < locations.length; ++ldx) {
+        const location = locations[ldx];
+        for (let idx = 0; idx < this.state.items.length; ++idx) {
+          const item = this.state.items[idx];
+          if (location === item.location) {
+            newItems.push(item);
           }
+        }
+      }
+      this.state.items = newItems;
+    }
+    return this;
+  }
+
+  sortByLocation() {
+    if (isNonEmptyArray(this.state.locations) && isNonEmptyArray(this.state.items)) {
+      this.state.items.sort((a, b) => {
+        let adx = this.state.locations.indexOf(a.location);
+        let bdx = this.state.locations.indexOf(b.location);
+        return adx < bdx ? -1 : bdx < adx ? 1 : 0;
+      });
+    }
+    return this;
+  }
+
+  found() {
+    return this.state && isNonEmptyArray(this.state.items);
+  }
+
+  numFound() {
+    return this.found() ? this.state.items.length : 0;
+  }
+
+  orderedByTime() {
+    let result = false;
+    if (isNonEmptyArray(this.state.items)) {
+      result = true;
+      for (let mdx = 0; mdx < this.state.items.length - 1; ++mdx) {
+        if (this.state.items[mdx].time > this.state.items[mdx + 1].time) {
+          return false;
         }
       }
     }
     return result;
   }
 
-  prune(tCutoff) {
-    Object.keys(this.history).forEach((key) => {
-      const items = this.history[key];
-      let newItems = [];
-      if (isArray(items)) {
-        for (let idx = 0; idx < items.length; ++idx) {
-          const item = items[idx];
-          if (tCutoff < item.time) {
-            newItems.push(item);
-          }
-        }
-      }
-      if (!isArray(items) || newItems.length !== items.length) {
-        this.history[key] = newItems;
-        this.dirty = true;
-      }
+  moving() {
+    return this.sortByLocation().orderedByTime();
+  }
+
+  _prune() {
+    if (this.state.items.length !== this.history[this.state.person]) {
+      this.dirty = true;
+      this.history[this.state.person] = this.state.items;
+    }
+    return this;
+  }
+
+  pruneAll(tCutoffMs) {
+    Object.keys(this.history).forEach((person) => {
+      this.person(person).cutoff(tCutoffMs)._prune();
     });
     return this;
   }

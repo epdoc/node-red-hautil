@@ -18,28 +18,66 @@ describe('LocationHistory', () => {
     getStorage: getStorage,
     setStorage: setStorage,
   };
-  describe('default', () => {
+  describe('basic', () => {
     let history = new LocationHistory(opts);
     it('find none', () => {
-      let r = history.find('bob', tNow - 2000, [g(0), g(1), g(2)]);
-      expect(r).toEqual(false);
+      history.person('bob');
+      expect(history.found()).toEqual(false);
+      expect(history.numFound()).toEqual(0);
+    });
+    it('cutoff one', () => {
+      history.add('bob', g(0), tNow - 500);
+      history.person('bob').cutoff(tNow - 2000);
+      expect(history.found()).toEqual(true);
+      expect(history.numFound()).toEqual(1);
+    });
+    it('cutoff none', () => {
+      history.person('bob').cutoff(tNow);
+      expect(history.found()).toEqual(false);
+      expect(history.numFound()).toEqual(0);
     });
     it('add and find', () => {
       history.add('bob', g(0), tNow - 500);
-      let r = history.find('bob', tNow - 1000, [g(0), g(1), g(2)]);
-      expect(r).toEqual(true);
-      r = history.find('andy', tNow - 1000, [g(0), g(1), g(2)]);
-      expect(r).toEqual(false);
-      r = history.find('bob', tNow - 400, [g(0), g(1), g(2)]);
-      expect(r).toEqual(false);
-      r = history.find('bob', tNow - 550, [g(0), g(1), g(2)]);
-      expect(r).toEqual(true);
-      r = history.find('bob', tNow - 550, [g(1), g(2)]);
-      expect(r).toEqual(false);
-      r = history.find('bob', tNow - 550, g(0));
-      expect(r).toEqual(true);
+      history
+        .person('bob')
+        .cutoff(tNow - 1000)
+        .locations([g(0), g(1), g(2)]);
+      expect(history.found()).toEqual(true);
+      expect(history.numFound()).toEqual(1);
+      history
+        .person('andy')
+        .cutoff(tNow - 1000)
+        .locations([g(0), g(1), g(2)]);
+      expect(history.numFound()).toEqual(0);
+      history
+        .person('bob')
+        .cutoff(tNow - 400)
+        .locations([g(0), g(1), g(2)]);
+      expect(history.numFound()).toEqual(0);
+      history
+        .person('bob')
+        .cutoff(tNow - 550)
+        .locations([g(0), g(1), g(2)]);
+      expect(history.numFound()).toEqual(1);
+      history
+        .person('bob')
+        .cutoff(tNow - 550)
+        .locations([g(1), g(2)]);
+      expect(history.numFound()).toEqual(0);
+      history.person('bob').cutoff(tNow - 550, g(0));
+      expect(history.numFound()).toEqual(1);
     });
-    it('add more', () => {
+    it('moving one location fail', () => {
+      history
+        .person('bob')
+        .cutoff(tNow - 2000)
+        .locations([g(0), g(1)]);
+      expect(history.found()).toEqual(true);
+      expect(history.moving()).toEqual(true);
+      history.locations([g(1), g(0)]);
+      expect(history.moving()).toEqual(false);
+    });
+    it('raw history add', () => {
       history.add('bob', g(0), tNow + 400);
       history.add('bob', g(1), tNow + 500);
       let items = history.history['bob'];
@@ -49,33 +87,69 @@ describe('LocationHistory', () => {
       expect(items[0].location).toEqual(g(0));
       expect(items[0].time).toEqual(tNow + 400);
     });
+    it('moving two location pass', () => {
+      history
+        .person('bob')
+        .cutoff(tNow - 2000)
+        .locations([g(0), g(1)]);
+      expect(history.moving()).toEqual(true);
+      expect(history.numFound()).toEqual(2);
+      history
+        .person('bob')
+        .cutoff(tNow - 2000)
+        .locations([g(1), g(0)]);
+      expect(history.moving()).toEqual(false);
+    });
+    it('moving two location fail', () => {
+      history
+        .person('bob')
+        .cutoff(tNow - 450)
+        .locations([g(0), g(1)]);
+      expect(history.moving()).toEqual(false);
+    });
+    it('moving two location wrong order', () => {
+      history
+        .person('bob')
+        .cutoff(tNow - 2000)
+        .locations([g(1), g(0)]);
+      expect(history.moving()).toEqual(false);
+    });
     it('find more', () => {
-      let r = history.find('bob', tNow - 1000, [g(0)]);
-      expect(r).toEqual(true);
-      r = history.find('bob', tNow - 1000, g(1));
-      expect(r).toEqual(true);
+      history
+        .person('bob')
+        .cutoff(tNow - 1000)
+        .locations([g(0)]);
+      expect(history.numFound()).toEqual(1);
+      history.person('bob').cutoff(tNow - 1000).locations(g(1));
+      expect(history.numFound()).toEqual(1);
     });
     it('prune nothing', () => {
-      history.prune(tNow + 300);
-      let r = history.find('bob', tNow - 1000, [g(0)]);
-      expect(r).toEqual(true);
-      r = history.find('bob', tNow - 1000, g(1));
-      expect(r).toEqual(true);
+      history.pruneAll(tNow + 300);
+      history
+        .person('bob')
+        .cutoff(tNow - 1000)
+        .locations([g(0)]);
+      expect(history.numFound()).toEqual(1);
+      history.person('bob').cutoff(tNow - 1000).locations(g(1));
+      expect(history.numFound()).toEqual(1);
     });
     it('prune one', () => {
-      history.prune(tNow + 450);
-      let r = history.find('bob', tNow - 1000, [g(0)]);
-      expect(r).toEqual(false);
-      r = history.find('bob', tNow - 1000, g(1));
-      expect(r).toEqual(true);
-      r = history.find('bob', tNow + 501, g(1));
-      expect(r).toEqual(false);
+      history.pruneAll(tNow + 450);
+      history
+        .person('bob')
+        .cutoff(tNow - 1000)
+        .locations([g(0)]);
+      expect(history.numFound()).toEqual(0);
+      history.person('bob').cutoff(tNow - 1000).locations(g(1));
+      expect(history.numFound()).toEqual(1);
+      history.person('bob').cutoff(tNow + 501).locations(g(1));
+      expect(history.numFound()).toEqual(0);
     });
-    it('pre flush', () => {
+    it('pre flush raw', () => {
       expect(db.gate_history).toBeUndefined();
     });
-    it('flush', () => {
-      history.add('bob', g(2), tNow + 600);
+    it('flush raw', () => {
+      history.add('bob', g(2),tNow + 600);
       history.flush();
       expect(db.gate_history).toBeDefined();
       expect(db.gate_history.bob).toHaveLength(2);
@@ -85,10 +159,16 @@ describe('LocationHistory', () => {
       history.history = {};
       history.read();
       expect(db.gate_history.bob).toHaveLength(2);
-      let r = history.find('bob', tNow - 1000, [g(1)]);
-      expect(r).toEqual(true);
-      r = history.find('bob', tNow - 1000, g(2));
-      expect(r).toEqual(true);
+      history
+        .person('bob')
+        .cutoff(tNow - 1000)
+        .locations([g(1)]);
+      expect(history.numFound()).toEqual(1);
+      history
+        .person('bob')
+        .cutoff(tNow - 1000)
+        .locations(g(2));
+      expect(history.numFound()).toEqual(1);
     });
   });
 });
