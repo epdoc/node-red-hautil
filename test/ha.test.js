@@ -1,5 +1,5 @@
 import { isObject } from 'epdoc-util';
-import { HA } from '../src';
+import { HA, newService } from '../src';
 
 describe('ha', () => {
   describe('entity data', () => {
@@ -27,7 +27,7 @@ describe('ha', () => {
         e2: { id: 'entity2' },
       };
       ha.retrieveSensorsData(dict);
-      expect(isObject (dict.e1.obj)).toEqual(true);
+      expect(isObject(dict.e1.obj)).toEqual(true);
       expect(isObject(dict.e2.obj)).toEqual(true);
       expect(dict.e2.state).toEqual('on');
       expect(dict.e1.state).toEqual('off');
@@ -36,30 +36,23 @@ describe('ha', () => {
 
   describe('service payload', () => {
     it('light on', () => {
-      const params = {
-        service: 'on',
-        entity_id: 'light.entity3',
-      };
-      const p = HA.getServicePayload(params);
+      const s = newService('light.entity3');
+      const p = s.service('on').payload();
       expect(isObject(p)).toEqual(true);
       expect(isObject(p.target)).toEqual(true);
       expect(p.service).toEqual('turn_on');
-      expect(p.target.entity_id).toEqual(params.entity_id);
+      expect(p.target.entity_id).toEqual('light.entity3');
       expect(p.domain).toEqual('light');
     });
     it('fan speed', () => {
-      const params = {
-        service: 'speed',
-        entity_id: 'fan.entity4',
-        speed: 3,
-      };
-      const p = HA.getServicePayload(params);
+      const s = newService('fan.entity4');
+      const p = s.speed(3).payload();
       expect(isObject(p)).toEqual(true);
       expect(isObject(p.target)).toEqual(true);
       expect(p.target.entity_id).toEqual('fan.entity4');
       expect(isObject(p.data)).toEqual(true);
       expect(p.service).toEqual('set_percentage');
-      expect(p.target.entity_id).toEqual(params.entity_id);
+      expect(p.target.entity_id).toEqual('fan.entity4');
       expect(p.domain).toEqual('fan');
       expect(p.data.percentage).toEqual(50);
     });

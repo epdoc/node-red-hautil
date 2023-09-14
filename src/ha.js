@@ -51,41 +51,4 @@ export class HA {
     }
   }
 
-  /**
-   * d.service = on, off, toggle, speed, percentage, arm_night, arm_away, arm_home, disarm
-   */
-  static getServicePayload(params) {
-    let p = {
-      service: params.service,
-      target: {
-        entity_id: params.entity_id,
-      },
-    };
-    if (params.domain) {
-      p.domain = params.domain;
-    } else {
-      const parts = params.entity_id.split('.');
-      p.domain = parts[0];
-    }
-    if (params.service === 'on' || params.service === 'off') {
-      p.service = 'turn_' + params.service;
-    }
-    if (p.domain === 'fan') {
-      if (params.service === 'speed') {
-        p.service = 'set_percentage';
-        p.data = {
-          percentage: Service.fanSpeedToPercentage(params.speed),
-        };
-      } else if (p.service === 'percentage') {
-        p.data = {
-          percentage: params.percentage,
-        };
-      }
-    } else if (p.domain === 'cover') {
-      p.service = params.service + '_cover';
-    } else if (p.domain === 'alarm_control_panel') {
-      p.service = 'alarm_' + params.service;
-    }
-    return p;
-  }
 }
