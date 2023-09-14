@@ -32,7 +32,7 @@ export function setFan(gHA, fnSend, fan, cmd, opts) {
   if (isInteger(cmd)) {
     speed = cmd;
   } else if (isString(cmd) && REG.onoff.test(cmd)) {
-    service = cmd.service;
+    service = cmd;
   } else if (isDict(cmd)) {
     if (isInteger(cmd.speed)) {
       speed = cmd.speed;
