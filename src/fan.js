@@ -60,7 +60,7 @@ export function setFan(gHA, fnSend, fan, cmd, opts) {
       } else {
         log(`Fan ${fan_id} is ${bEntityOn}, no need to turn off`);
       }
-      if (!bEntityOn && !bLightning && (bOn || opts.speed > 0)) {
+      if (!bEntityOn && !bLightning && (bOn || speed > 0)) {
         log(`Turn on ${switch_id} because fan was off`);
         let payload = newService(switch_id).service('on').payload();
         fnSend(payload);
