@@ -40,7 +40,7 @@ export function setFan(gHA, fnSend, params, opts) {
     return ha.isEntityOn(switch_id);
   }
   function fanState() {
-    return ha.entityState(switch_id)
+    return ha.entityState(switch_id);
   }
 
   let speed;
@@ -56,7 +56,7 @@ export function setFan(gHA, fnSend, params, opts) {
     bOn = service === 'on';
     bOff = service === 'off';
   }
-  const timeout = parseInt(params.timeout,10);
+  const timeout = parseInt(params.timeout, 10);
 
   // const currentPct = ha.getEntitySpeed(fan_id);
 
@@ -109,7 +109,7 @@ export function setFan(gHA, fnSend, params, opts) {
       return Promise.resolve();
     })
     .then(function () {
-      if (bOn && timeout && !bLightning) {
+      if ((bOn || speed > 0) && timeout && !bLightning) {
         log(`timeout ${timeout} for ${switch_id}`);
         return delayPromise(timeout);
       } else {
@@ -117,7 +117,7 @@ export function setFan(gHA, fnSend, params, opts) {
       }
     })
     .then(function () {
-      if (bOn && timeout && !bLightning) {
+      if ((bOn || speed > 0) && timeout && !bLightning) {
         log(`timeout turn off for ${switch_id}`);
         let payload = newService(switch_id).service('off').payload();
         fnSend(payload);
