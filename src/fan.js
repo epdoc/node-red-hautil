@@ -21,7 +21,8 @@ export function setFan(gHA, fnSend, fan, cmd, opts) {
   const DELAY = [1000, 3000];
   const fan_id = 'fan.' + fan;
   const switch_id = fan_id;
-  const log = opts && isFunction(opts.log) ? opts.log : (msg) => {};
+  opts = isDict(opts) ? opts : {};
+  const log = isFunction(opts.log) ? opts.log : (msg) => {};
 
   const ha = new HA(gHA);
   const bLightning = ha.isEntityOn('input_boolean.lightning');
