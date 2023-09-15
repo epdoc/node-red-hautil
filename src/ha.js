@@ -24,6 +24,11 @@ export class HA {
     return this._ha.states[entity_id];
   }
 
+  entityState(entity_id) {
+    const entity = this.getEntity(entity_id);
+    return entity ? entity.state : null;
+  }
+
   isEntityOn(entity_id) {
     return this.isEntityState(entity_id,'on')
   }
@@ -33,11 +38,11 @@ export class HA {
   }
 
   isEntityState(entity_id,val) {
-    const entity = this.getEntity(entity_id);
-    return entity && entity.state === val ? true : false;
+    const state = this.entityState(entity_id);
+    return state === val ? true : false;
   }
 
-  entityValueAsNumber(entity_id,defval) {
+  entityStateAsNumber(entity_id,defval) {
     const entity = this.getEntity(entity_id);
     return entity ? parseFloat(entity.state) : defval;
   }

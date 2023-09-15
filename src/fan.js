@@ -1,8 +1,8 @@
 // returns a promise
 
-import { isDict, isFunction, isInteger, isString } from 'epdoc-util';
+import { isDict, isFunction, isInteger, isNumber, isPosInteger, isString } from 'epdoc-util';
 import { HA } from './ha';
-import { newService } from './service';
+import { Service, newService } from './service';
 import { delayPromise } from './util';
 
 const REG = {
@@ -11,57 +11,69 @@ const REG = {
 
 /**
  * Parameters:
+ *  gHA - Set to global.get('homeassistant')
+ *  fnSend - callback is passed the payload for a message to pass to the Set Service node.
+ *  params.fan - short name of fan (eg. 'master_bedroom')
+ *  params.speed - speed (1-6) to set fan. 0 will turn off fan, unless params.service is 'on'
+ *  params.percentage - can be used instead of speed. speed takes precedence. 
+ *  params.service - must be 'on' or 'off'. 
+ *  params.timeout - used with service 'on' to turn fan 'off' after timeout milliseconds. 
+ *  opts.log - callback is passed a string for writing debug messages
+ });
+ });
  *  fan - (required, string) short name of the fan (e.g. 'master_bedroom')
  *  cmd - (required) One of 'on', 'off' or a number from 0 to 6.
  *  opts.timeout - (optional, ms) If set, and service is 'on', the fan will be turned off after this amount of time.
  *  opts.log - Function takes a msg and returns a promise
  */
-export function setFan(gHA, fnSend, fan, cmd, opts) {
+export function setFan(gHA, fnSend, params, opts) {
   // const switch_id = "switch." + fan + "_fan_switch";
   const DELAY = [1000, 3000];
-  const fan_id = 'fan.' + fan;
+  const fan_id = 'fan.' + params.fan;
   const switch_id = fan_id;
   opts = isDict(opts) ? opts : {};
   const log = isFunction(opts.log) ? opts.log : (msg) => {};
 
   const ha = new HA(gHA);
   const bLightning = ha.isEntityOn('input_boolean.lightning');
-  const bEntityOn = ha.isEntityOn(switch_id);
+  function isFanOn() {
+    return ha.isEntityOn(switch_id);
+  }
+  function fanState() {
+    return ha.entityState(switch_id)
+  }
 
   let speed;
   let service;
-  if (isInteger(cmd)) {
-    speed = cmd;
-  } else if (isString(cmd) && REG.onoff.test(cmd)) {
-    service = cmd;
-  } else if (isDict(cmd)) {
-    if (isInteger(cmd.speed)) {
-      speed = cmd.speed;
-    }
-    if (isString(cmd.service) && REG.onoff.test(cmd.service)) {
-      service = cmd.service;
-    }
+  let bOn = false;
+  let bOff = false;
+  if (isInteger(params.speed)) {
+    speed = params.speed;
+  } else if (isNumber(params.percentage)) {
+    speed = Service.fanPercentageToSpeed(params.percentage);
+  } else if (isString(params.service) && REG.onoff.test(params.service)) {
+    service = params.service;
+    bOn = service === 'on';
+    bOff = service === 'off';
   }
+  const timeout = parseInt(params.timeout,10);
 
   // const currentPct = ha.getEntitySpeed(fan_id);
-
-  const bOn = service === 'on';
-  const bOff = service === 'off';
 
   let bTurnedOn = false;
 
   return Promise.resolve()
     .then((resp) => {
-      log(`${switch_id} is ${bEntityOn}`);
+      log(`${switch_id} is ${fanState()}`);
       log(`lightning is ${bLightning}`);
-      if (bEntityOn && (bLightning || bOff || (!bOn && speed === 0))) {
+      if (isFanOn() && (bLightning || bOff || (!bOn && speed === 0))) {
         log(`Turn off ${fan_id}`);
         let payload = newService(fan_id).service('off').payload();
         fnSend(payload);
       } else {
-        log(`Fan ${fan_id} is ${bEntityOn}, no need to turn off`);
+        log(`Fan ${fan_id} is ${fanState()}, no need to turn off`);
       }
-      if (!bEntityOn && !bLightning && (bOn || speed > 0)) {
+      if (!isFanOn() && !bLightning && (bOn || speed > 0)) {
         log(`Turn on ${switch_id} because fan was off`);
         let payload = newService(switch_id).service('on').payload();
         fnSend(payload);
@@ -97,15 +109,15 @@ export function setFan(gHA, fnSend, fan, cmd, opts) {
       return Promise.resolve();
     })
     .then(function () {
-      if (bOn && opts.timeout && !bLightning) {
-        log(`timeout ${opts.timeout} for ${switch_id}`);
-        return delayPromise(opts.timeout);
+      if (bOn && timeout && !bLightning) {
+        log(`timeout ${timeout} for ${switch_id}`);
+        return delayPromise(timeout);
       } else {
         return Promise.resolve();
       }
     })
     .then(function () {
-      if (bOn && opts.timeout && !bLightning) {
+      if (bOn && timeout && !bLightning) {
         log(`timeout turn off for ${switch_id}`);
         let payload = newService(switch_id).service('off').payload();
         fnSend(payload);

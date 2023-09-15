@@ -1,4 +1,4 @@
-import { isFunction, isObject } from 'epdoc-util';
+import { isDict, isFunction } from 'epdoc-util';
 
 export function newService(name, options) {
   return new Service(name, options);
@@ -22,7 +22,7 @@ export class Service {
     };
     const parts = entity_id.split('.');
     this._payload.domain = parts[0];
-    if (isObject(opts)) {
+    if (isDict(opts)) {
       this._warn = isFunction(opts.warn) ? opts.warn : null;
     }
   }
