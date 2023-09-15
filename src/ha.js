@@ -1,4 +1,4 @@
-import { isFunction } from 'epdoc-util';
+import { isFunction, isNumber } from 'epdoc-util';
 import { Service } from './service';
 
 export function newHA(globalHomeAssistant, options) {
@@ -29,9 +29,9 @@ export class HA {
     return entity && entity.state === 'on' ? true : false;
   }
 
-  entityValueAsNumber(entity_id) {
+  entityValueAsNumber(entity_id,valDefault) {
     const entity = this.getEntity(entity_id);
-    return entity && isNumber(entity.state) ? entity.state : null
+    return entity && isNumber(entity.state) ? entity.state : valDefault;
   }
 
   getEntitySpeed(entity_id) {
