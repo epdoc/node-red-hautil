@@ -196,3 +196,5 @@ There is also the
 [functionExternalModules](https://nodered.org/docs/user-guide/writing-functions#using-the-functionexternalmodules-option)
 that can make it easier to use external modules. I haven't experimented with
 this.
+
+Unfortunately there is no editor code completion using any of the techniques described here for use of external code.
