@@ -1,6 +1,6 @@
 {
   "name": "epdoc-node-red-utils",
-  "version": "0.11.0",
+  "version": "0.11.1",
   "description": "Jim's Node-RED utils for Home Assistant",
   "private": false,
   "keywords": [

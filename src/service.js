@@ -24,6 +24,7 @@ export class Service {
     this._payload.domain = parts[0];
     if (isDict(opts)) {
       this._warn = isFunction(opts.warn) ? opts.warn : null;
+      this._warn = isFunction(opts.log) ? opts.log : null;
     }
   }
 
@@ -34,6 +35,14 @@ export class Service {
   domain(val) {
     this._payload.domain = val;
     return this;
+  }
+
+  on() {
+    return this.service('on');
+  }
+
+  off() {
+    return this.service('off');
   }
 
   service(val) {

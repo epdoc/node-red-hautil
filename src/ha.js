@@ -47,6 +47,11 @@ export class HA {
     return entity ? parseFloat(entity.state) : defval;
   }
 
+  entityStateAsInt(entity_id,defval) {
+    const entity = this.getEntity(entity_id);
+    return entity ? parseInt(entity.state,10) : defval;
+  }
+
   getEntitySpeed(entity_id,defval) {
     const entity = this.getEntity(entity_id);
     // debug && node.warn(entity_id + " = " + JSON.stringify(entity));
@@ -64,9 +69,22 @@ export class HA {
     for (const name in sensorDict) {
       if (sensorDict.hasOwnProperty(name)) {
         let item = sensorDict[name];
-        item.obj = this.ha.states[item.id];
+        item.obj = this.getEntity(item.id);
         if (item.obj) {
           item.state = item.obj.state;
+        }
+        if( item.type === 'boolean' ) {
+          if(item.state === 'on' ) {
+            item.on = true;
+            item.off = false;
+          } else if(item.state === 'off' ) {
+            item.on = false;
+            item.off = true;
+          }
+        } else if( item.type === 'number') {
+          item.val = this.entityStateAsNumber(item.id,item.defval);
+        } else if( item.type === 'int') {
+          item.val = this.entityStateAsInt(item.id,item.defval);
         }
       }
     }
