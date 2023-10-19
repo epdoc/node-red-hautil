@@ -27,6 +27,11 @@ const REG = {
       turn: new RegExp(/^(on|off)$/),
     },
   },
+  input_boolean: {
+    prefix: {
+      turn: new RegExp(/^(on|off)$/),
+    },
+  },
 };
 
 export function newService(name, options) {
@@ -107,6 +112,9 @@ export class Service {
   open() {
     return this.service('open');
   }
+  stop() {
+    return this.service('stop');
+  }
 
   /**
    * Shortcut to set service to alarm_disarm.
@@ -114,6 +122,12 @@ export class Service {
    */
   disarm() {
     return this.service('disarm');
+  }
+  increment() {
+    return this.service('increment');
+  }
+  decrement() {
+    return this.service('decrement');
   }
 
   /**
@@ -147,6 +161,14 @@ export class Service {
         this._payload.service = val;
       }
     }
+    return this;
+  }
+
+  value(val) {
+    this._payload.service = 'set_value';
+    this._payload.data = {
+      value: val,
+    };
     return this;
   }
 

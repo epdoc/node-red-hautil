@@ -105,6 +105,29 @@ describe('service', () => {
           });
         });
       });
+      describe('input_number', () => {
+        it('value', () => {
+          const payload = new Service('input_number.master_bedroom');
+          let result = payload.value(32.3).payload();
+          expect(isObject(result)).toEqual(true);
+          expect(result).toEqual({
+            target: { entity_id: 'input_number.master_bedroom' },
+            domain: 'input_number',
+            service: 'set_value',
+            data: { value: 32.3 },
+          });
+        });
+        it('increment', () => {
+          const payload = new Service('input_number.master_bedroom');
+          let result = payload.increment().payload();
+          expect(isObject(result)).toEqual(true);
+          expect(result).toEqual({
+            target: { entity_id: 'input_number.master_bedroom' },
+            domain: 'input_number',
+            service: 'increment',
+          });
+        });
+      });
       describe('cover', () => {
         it('close', () => {
           const payload = new Service('cover.master_bedroom');
@@ -129,6 +152,16 @@ describe('service', () => {
         it('stop', () => {
           const payload = new Service('cover.master_bedroom');
           let result = payload.service('stop_cover').payload();
+          expect(isObject(result)).toEqual(true);
+          expect(result).toEqual({
+            target: { entity_id: 'cover.master_bedroom' },
+            domain: 'cover',
+            service: 'stop_cover',
+          });
+        });
+        it('stop2', () => {
+          const payload = new Service('cover.master_bedroom');
+          let result = payload.stop().payload();
           expect(isObject(result)).toEqual(true);
           expect(result).toEqual({
             target: { entity_id: 'cover.master_bedroom' },
