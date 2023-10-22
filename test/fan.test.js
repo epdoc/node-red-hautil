@@ -8,10 +8,10 @@ describe('setFan', () => {
           'input_boolean.lightning': {
             state: 'on',
           },
-          'switch.master_bedroom': {
+          'switch.away_room': {
             state: 'on',
           },
-          'fan.master_bedroom': {
+          'fan.away_room': {
             state: 'on',
           },
         },
@@ -28,12 +28,12 @@ describe('setFan', () => {
         gHA,
         (payload) => {
           expect(payload).toEqual({
-            target: { entity_id: 'fan.master_bedroom' },
+            target: { entity_id: 'fan.away_room' },
             service: 'turn_off',
             domain: 'fan',
           });
         },
-        { fan: 'master_bedroom', service: 'on' },
+        { fan: 'away_room', service: 'on' },
         { log: logCb },
       );
     });
@@ -45,10 +45,10 @@ describe('setFan', () => {
           'input_boolean.lightning': {
             state: 'off',
           },
-          'switch.master_bedroom': {
+          'switch.away_room': {
             state: 'on',
           },
-          'fan.master_bedroom': {
+          'fan.away_room': {
             state: 'on',
           },
         },
@@ -59,17 +59,17 @@ describe('setFan', () => {
     function logCb(s) {
       console.log(s);
     }
-   it('already on', () => {
+    it('already on', () => {
       return setFan(
         gHA,
         (payload) => {
           expect(payload).toEqual({
-            target: { entity_id: 'fan.master_bedroom' },
+            target: { entity_id: 'fan.away_room' },
             service: 'turn_off',
             domain: 'fan',
           });
         },
-        { fan: 'master_bedroom', service: 'on' },
+        { fan: 'away_room', service: 'on' },
         { log: logCb },
       );
     });
@@ -81,10 +81,10 @@ describe('setFan', () => {
           'input_boolean.lightning': {
             state: 'off',
           },
-          'switch.master_bedroom': {
+          'switch.away_room': {
             state: 'off',
           },
-          'fan.master_bedroom': {
+          'fan.away_room': {
             state: 'off',
           },
         },
@@ -100,12 +100,12 @@ describe('setFan', () => {
         gHA,
         (payload) => {
           expect(payload).toEqual({
-            target: { entity_id: 'fan.master_bedroom' },
+            target: { entity_id: 'fan.away_room' },
             service: 'turn_on',
             domain: 'fan',
           });
         },
-        { fan: 'master_bedroom', service: 'on', timeout: 5000 },
+        { fan: 'away_room', service: 'on', timeout: 5000 },
         { log: logCb },
       );
     });

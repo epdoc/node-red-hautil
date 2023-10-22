@@ -1,5 +1,5 @@
 import { isObject } from 'epdoc-util';
-import { HA, newService } from '../src';
+import { HA, newFanSpeed6Service, newService } from '../src';
 
 describe('ha', () => {
   describe('entity data', () => {
@@ -18,8 +18,9 @@ describe('ha', () => {
     let ha = new HA(gHA);
 
     it('isEntityOn', () => {
-      expect(ha.isEntityOn('entity2')).toEqual(true);
-      expect(ha.isEntityOn('entity1')).toEqual(false);
+      expect(ha.entity('entity2').isOn()).toEqual(true);
+      expect(ha.entity('entity1').state().isOff()).toEqual(true);
+      expect(ha.entity('entity1').isOn()).toEqual(false);
     });
     it('retrieve sensor data', () => {
       const dict = {
@@ -27,34 +28,35 @@ describe('ha', () => {
         e2: { id: 'entity2' },
       };
       ha.retrieveSensorsData(dict);
-      expect(isObject(dict.e1.obj)).toEqual(true);
-      expect(isObject(dict.e2.obj)).toEqual(true);
-      expect(dict.e2.state).toEqual('on');
-      expect(dict.e1.state).toEqual('off');
+      expect(isObject(dict.e1.entity)).toEqual(true);
+      expect(isObject(dict.e2.entity)).toEqual(true);
+      expect(dict.e2.entity.state().toString()).toEqual('on');
+      expect(dict.e1.entity.isOff()).toEqual(true);
+      expect(dict.e1.entity.state().isOff()).toEqual(true);
+      expect(dict.e1.entity.state().value()).toEqual('off');
     });
   });
 
   describe('service payload', () => {
     it('light on', () => {
       const s = newService('light.entity3');
-      const p = s.service('on').payload();
+      const p = s.service('turn_on').payload();
       expect(isObject(p)).toEqual(true);
-      expect(isObject(p.target)).toEqual(true);
-      expect(p.service).toEqual('turn_on');
-      expect(p.target.entity_id).toEqual('light.entity3');
-      expect(p.domain).toEqual('light');
+      expect(p).toEqual({
+        target: { entity_id: 'light.entity3' },
+        domain: 'light',
+        service: 'turn_on',
+      });
     });
     it('fan speed', () => {
-      const s = newService('fan.entity4');
-      const p = s.speed(3).payload();
+      const p = newFanSpeed6Service('entity4').speed(3).payload();
       expect(isObject(p)).toEqual(true);
-      expect(isObject(p.target)).toEqual(true);
-      expect(p.target.entity_id).toEqual('fan.entity4');
-      expect(isObject(p.data)).toEqual(true);
-      expect(p.service).toEqual('set_percentage');
-      expect(p.target.entity_id).toEqual('fan.entity4');
-      expect(p.domain).toEqual('fan');
-      expect(p.data.percentage).toEqual(50);
+      expect(p).toEqual({
+        target: { entity_id: 'fan.entity4' },
+        domain: 'fan',
+        service: 'set_percentage',
+        data: { percentage: 50 },
+      });
     });
   });
 });
