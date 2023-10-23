@@ -1,4 +1,4 @@
-This documents a few strategies for including reusable code in Node-RED.
+This documents a few strategies for including reusable code in Node-RED. 
 
 ## ES6 and Typescript Code Compatibility with Node-RED
 
@@ -84,7 +84,7 @@ locally](https://nodered.org/docs/getting-started/local).
 
 ### Home Assistant with the Node-RED add-on
 
-In this situation  Node-RED is probably running in a container where you don't
+In this situation  Node-RED is (I think) running in a container where you don't
 have access to the tools needed (git, yarn, ssh keys). The best way to add
 unpublished packages is to do so on the Home Assistant Settings > Addons > Node-RED >
 Configuration page.

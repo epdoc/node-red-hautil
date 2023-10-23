@@ -47,6 +47,10 @@ export class Entity {
     return new EntityState(this._entity ? this._entity.state : undefined);
   }
 
+  exists() {
+    return this._entity ? true : false;
+  }
+
   isOn() {
     return this.state().isOn();
   }
@@ -131,9 +135,9 @@ export class HA {
             item.off = true;
           }
         } else if (item.type === 'number') {
-          item.val = item.asNumber(item.defval);
+          item.val = item.entity.asNumber(item.defval);
         } else if (item.type === 'int') {
-          item.val = item.asInt(item.defval);
+          item.val = item.entity.asInt(item.defval);
         }
       }
     }
