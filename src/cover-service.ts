@@ -1,21 +1,17 @@
-"use strict";
+import { LogOpts } from './function-log';
+import { Service } from './service';
+import { EntityDomain, EntityId } from './types';
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.CoverService = void 0;
-exports.newCoverService = newCoverService;
-var _service = require("./service");
-function newCoverService(name, options) {
-  return new CoverService(name, options);
+export function newCoverService(entity_id: EntityId, opts: LogOpts) {
+  return new CoverService(entity_id, opts);
 }
 
 /**
  * Payload builder for service call
  */
-class CoverService extends _service.Service {
+export class CoverService extends Service {
   // _domain = 'cover';
-  _domain() {
+  _domain(): EntityDomain {
     return 'cover';
   }
 
@@ -23,7 +19,7 @@ class CoverService extends _service.Service {
    * Shortcut to set service to close_cover.
    * @returns
    */
-  close() {
+  close(): CoverService {
     this._payload.service = 'close_cover';
     return this;
   }
@@ -32,13 +28,13 @@ class CoverService extends _service.Service {
    * Shortcut to set service to open_cover.
    * @returns
    */
-  open() {
+  open(): CoverService {
     this._payload.service = 'open_cover';
     return this;
   }
-  stop() {
+
+  stop(): CoverService {
     this._payload.service = 'stop_cover';
     return this;
   }
 }
-exports.CoverService = CoverService;

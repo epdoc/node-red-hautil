@@ -136,6 +136,28 @@ describe('service', () => {
           });
         });
       });
+      describe('input_boolean', () => {
+        it('value', () => {
+          const payloadBuilder = new SwitchService('input_boolean.test_alive');
+          let payload = payloadBuilder.on().payload();
+          expect(isObject(payload)).toEqual(true);
+          expect(payload).toEqual({
+            target: { entity_id: 'input_boolean.test_alive' },
+            domain: 'input_boolean',
+            service: 'turn_on',
+          });
+        });
+        it('increment', () => {
+          const payload = new Service('input_number.master_bedroom');
+          let result = payload.increment().payload();
+          expect(isObject(result)).toEqual(true);
+          expect(result).toEqual({
+            target: { entity_id: 'input_number.master_bedroom' },
+            domain: 'input_number',
+            service: 'increment',
+          });
+        });
+      });
       describe('cover', () => {
         it('close', () => {
           const payload = new CoverService('garage').close().payload();
@@ -206,7 +228,7 @@ describe('service', () => {
           });
         });
         it('arm_night', () => {
-          const payload = new AlarmService('workshop').arm().night().payload();
+          const payload = new AlarmService('workshop').arm('night').payload();
           expect(isObject(payload)).toEqual(true);
           expect(payload).toEqual({
             target: { entity_id: 'alarm_control_panel.workshop' },
@@ -215,7 +237,7 @@ describe('service', () => {
           });
         });
         it('arm_trigger', () => {
-          const payload = new AlarmService('workshop').arm().trigger().payload();
+          const payload = new AlarmService('workshop').arm('trigger').payload();
           expect(isObject(payload)).toEqual(true);
           expect(payload).toEqual({
             target: { entity_id: 'alarm_control_panel.workshop' },

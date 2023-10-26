@@ -4,13 +4,15 @@ This documents a few strategies for including reusable code in Node-RED.
 
 The code in this repository is written in ECMAScript 2015 (ES6). This code will
 work in Node-RED, but NODE-RED will not import ES6 modules.
-I used [Babel](https://babeljs.io/docs/babel-plugin-transform-modules-commonjs) to
-convert my ES6 modules to CommonJS that can be loaded using `require`.
+[Babel](https://babeljs.io/docs/babel-plugin-transform-modules-commonjs) was
+used in this project to convert the ES6 modules to CommonJS that can be loaded
+using `require`.
 
 Equally, you can use transpiled Typescript code, as I have shown when I add my
 [general utilities package](https://github.com/jpravetz/epdoc-util) to Node-RED.
 
-For classes I found it easiest to add a constructor method outside of the scope of the class.
+For classes it is perhaps easiest to add a constructor method outside of the
+scope of the class:
 
 ```javascript
 export function newHA(globalHomeAssistant, options) {
@@ -30,12 +32,13 @@ export class HA {
 
 ## Including published packages with Node-RED
 
-The easiest technique here is to add these packages to the function editor > Setup tab.
+The the most direct technique here is to add these packages to the function
+editor > Setup tab.
 
 
 ![Moment](./www/moment.png)
 
-then reference the code by the 'import as' value:
+Now you can reference the code by the 'import as' value:
 
 
 ```javascript
@@ -51,13 +54,14 @@ You can use the previous technique for loading unpublished git packages. This
 refers to packages that are in public repositories, but that haven't been
 published to npm. 
 
-But the previous technique has limitations:
+However the previous technique has limitations:
 
  * Lots of [git
 URL](https://docs.npmjs.com/cli/v10/configuring-npm/package-json#git-urls-as-dependencies)
-cut and paste
+cut and pasting
  * You can't use SSH URLs from within the Node-RED Home Assistant add-on
- * Version and tag specifiers don't seem to work with the add-on.
+ * Version and tag specifiers don't seem to work with the add-on (I need to
+   spend more time to confirm this to be the case)
 
 The [git
 URL](https://docs.npmjs.com/cli/v10/configuring-npm/package-json#git-urls-as-dependencies)
@@ -66,8 +70,8 @@ issues, if your instance of Node-RED is an add-on to Home Assistant.
 
 ### Standalone Node-RED, not coupled with Home Assistant
 
-I find it easiest to manually install and update unpublished packages using npm,
-then referencing these packages from the function editor > Setup tab. For example
+You may find it easiest to manually install and update unpublished packages using npm,
+then reference these packages from the function editor > Setup tab. For example
 
 ```shell
 npm install git@github.com:jpravetz/epdoc-util.git
@@ -84,7 +88,7 @@ locally](https://nodered.org/docs/getting-started/local).
 
 ### Home Assistant with the Node-RED add-on
 
-In this situation  Node-RED is (I think) running in a container where you don't
+In this situation  Node-RED is (I believe) running in a container where you don't
 have access to the tools needed (git, yarn, ssh keys). The best way to add
 unpublished packages is to do so on the Home Assistant Settings > Addons > Node-RED >
 Configuration page.
@@ -105,7 +109,7 @@ what happens with updates. [I need to do further investation by looking at the c
 
 Ugly workarounds are required. 
 
-What I found easist for myself was to just copy the entire text contents of
+What I did at one ugly point in time was to just copy the entire text contents of
 updated files from my dev editor, open the same file in Home Assistant (using
 the Sudio Code Server addon) and paste/overwrite the file contents of the old
 file.
@@ -114,6 +118,11 @@ Another solution is to `scp` your files across and hand edit the `package.json` 
 `package-lock.json` files to reflect the new commit values. I did this a couple of
 times with success.
 
+Eventually I published the code to npm, referenced it from the package.json
+file, and restarted Node-RED within Home Assistant (this is done from the
+_Settings > Add-ons > Node-RED_ page). For updates, I delete the appropriate
+subfolder underneath node_modules, and restart Node-RED.
+
 ## Adding code directly to Node-RED
 
 If you don't need to develop and test your code in a separate project, you can
@@ -121,12 +130,13 @@ just include reusable code in Node-RED by adding it to a functions node, then
 adding that code to the global context.
 
 This is really the easier solution, except it restricts you editing code within
-the Node-RED editor, you can't use Typescript, and means you can run unit tests
-like `jest`.
+the Node-RED editor, you can't use Typescript, and this means you can run unit
+tests.
 
-What I do is create a new flow tab, then add an inject and function node to the
-flow. The inject node is configured to inject once after 3 seconds, and connects
-to the function node. The function node contains code such as the following:
+To do this you might wish to create a new flow tab, then add an inject and
+function node to the flow. The inject node is configured to inject once after 3
+seconds, and connects to the function node. The function node contains code such
+as the following:
 
 
 ```javascript
@@ -182,4 +192,6 @@ There is also the
 that can make it easier to use external modules. I haven't experimented with
 this.
 
-Unfortunately there is no editor code completion using any of the techniques described here for use of external code.
+Unfortunately, when editing code within the Function Node, there is no editor
+code completion using any of the techniques described here for including
+external code.

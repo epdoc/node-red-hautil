@@ -18,14 +18,15 @@ Utilities for my personal use of Node-RED with Home Assistant. Included are:
 
 ## Installation and Use
 
-I find the easiest way to install this package with Home Assistant is to add
+Perhaps the easiest way to install this package with Home Assistant is to add
 this dependency to the Node-RED `package.json` file and restart Node-RED. This
-should cause the module to be installed and available. For updates, I delete the
-subfolder from the `node_modules` folder and restart Node-RED.
+should cause the module to be installed and available. For updates, one
+technique is to delete the subfolder from the `node_modules` folder and restart
+Node-RED.
 
-I also add the module to globals, so that I don't need to specify the module in
-each function node where it is used.  Here are the required changes to
-`settings.json` for this to work:
+Something else you can do is add the module to globals, so that you don't need
+to specify the module in each function node where it is used.  Here are the
+required changes to `settings.json` for this to work:
 
 ```json
   functionGlobalContext: {
@@ -41,7 +42,8 @@ const utils = global.get("epdoc-node-red-utils");
 node.warn(g.googleDate(new Date()));
 ```
 
-I have a more exhaustive discussion of how to use your own libraries in Node-RED [here](./NODE-RED.md).
+You can find a more exhaustive discussion of how to use your own libraries in
+Node-RED [here](./NODE-RED.md).
 
 ## Service Class
 
