@@ -591,49 +591,6 @@ var require_dist = __commonJS((exports) => {
   }
   exports.Util = Util;
 });
-// package.json
-var package_default = {
-  name: "epdoc-node-red-utils",
-  version: "0.15.0",
-  description: "Node-RED utils for Home Assistant",
-  private: false,
-  modules: "src/index.ts",
-  type: "module",
-  keywords: [
-    "util",
-    "nodered",
-    "homeassistant"
-  ],
-  license: "GNU GENERAL PUBLIC LICENSE",
-  author: {
-    name: "James Pravetz",
-    email: "jpravetz@epdoc.com"
-  },
-  main: "dist/index.js",
-  repository: {
-    type: "git",
-    url: "git+https://github.com/jpravetz/hassio-node-red-utils.git"
-  },
-  scripts: {
-    build: "bun build ./src/index.ts --outdir ./dist",
-    clean: "rm -rf dist && echo 'Done.'",
-    coverage: "bun test --coverage",
-    format: "prettier --write 'src/**/*.ts'"
-  },
-  devDependencies: {
-    eslint: "^8.49.0",
-    "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-prettier": "^5.0.0",
-    prettier: "^3.0.3",
-    "bun-types": "latest"
-  },
-  dependencies: {
-    "epdoc-util": "^0.2.6"
-  },
-  peerDependencies: {
-    typescript: "^5.0.0"
-  }
-};
 
 // src/function-log.ts
 var import_epdoc_util = __toESM(require_dist(), 1);
@@ -784,6 +741,38 @@ class CoverService extends Service {
     return this;
   }
 }
+// src/entity-state.ts
+class EntityState {
+  _state;
+  constructor(state) {
+    this._state = state;
+  }
+  equals(val) {
+    return this._state === val;
+  }
+  isOn() {
+    return this.equals("on");
+  }
+  isOff() {
+    return this.equals("off");
+  }
+  asNumber(defval) {
+    return this._state ? parseFloat(this._state) : defval;
+  }
+  asInt(defval) {
+    return this._state ? parseInt(this._state, 10) : defval;
+  }
+  asInteger(defval) {
+    return this.asInt(defval);
+  }
+  toString() {
+    return this._state;
+  }
+  value() {
+    return this._state;
+  }
+}
+
 // src/fan-speed6-service.ts
 var import_epdoc_util2 = __toESM(require_dist(), 1);
 
@@ -831,6 +820,10 @@ class LightService extends SwitchService {
 }
 
 // src/fan-service.ts
+function newFanService(entity_id, opts) {
+  return new FanService(entity_id, opts);
+}
+
 class FanService extends LightService {
   constructor() {
     super(...arguments);
@@ -873,40 +866,6 @@ class FanSpeed6Service extends FanService {
     return 0;
   }
 }
-// src/fan.ts
-var import_epdoc_util3 = __toESM(require_dist(), 1);
-
-// src/entity-state.ts
-class EntityState {
-  _state;
-  constructor(state) {
-    this._state = state;
-  }
-  equals(val) {
-    return this._state === val;
-  }
-  isOn() {
-    return this.equals("on");
-  }
-  isOff() {
-    return this.equals("off");
-  }
-  asNumber(defval) {
-    return this._state ? parseFloat(this._state) : defval;
-  }
-  asInt(defval) {
-    return this._state ? parseInt(this._state, 10) : defval;
-  }
-  asInteger(defval) {
-    return this.asInt(defval);
-  }
-  toString() {
-    return this._state;
-  }
-  value() {
-    return this._state;
-  }
-}
 
 // src/entity.ts
 class Entity {
@@ -942,6 +901,8 @@ class Entity {
     return defval;
   }
 }
+// src/fan.ts
+var import_epdoc_util3 = __toESM(require_dist(), 1);
 
 // src/ha.ts
 function newHA(globalHomeAssistant, opts) {
@@ -1074,95 +1035,11 @@ function setFan(gHA, fnSend, params, opts) {
 var REG = {
   onoff: new RegExp(/^(on|off)$/, "i")
 };
-// src/location-history.ts
+// src/history-filter.ts
 var import_epdoc_util5 = __toESM(require_dist(), 1);
 
-// src/history-filter.ts
-var import_epdoc_util4 = __toESM(require_dist(), 1);
-class HistoryFilter {
-  _person;
-  _items = [];
-  _locations = [];
-  _tCutoffMs;
-  constructor(person, items) {
-    this._person = person;
-    this._items = import_epdoc_util4.deepCopy(items);
-  }
-  cutoff(tCutoffMs) {
-    this._tCutoffMs = tCutoffMs;
-    if (import_epdoc_util4.isNonEmptyArray(this._items)) {
-      let newItems = [];
-      for (let idx = 0;idx < this._items.length; ++idx) {
-        const item = this._items[idx];
-        if (this._tCutoffMs < item.time) {
-          newItems.push(item);
-        }
-      }
-      this._items = newItems;
-    }
-    return this;
-  }
-  locations(locations) {
-    this._locations = import_epdoc_util4.isArray(locations) ? locations : [locations];
-    if (import_epdoc_util4.isNonEmptyArray(this._items) && import_epdoc_util4.isNonEmptyArray(this._locations)) {
-      let newItems = [];
-      for (let ldx = 0;ldx < this._locations.length; ++ldx) {
-        const location = this._locations[ldx];
-        for (let idx = 0;idx < this._items.length; ++idx) {
-          const item = this._items[idx];
-          if (location === item.location) {
-            newItems.push(item);
-          }
-        }
-      }
-      this._items = newItems;
-    }
-    return this;
-  }
-  sortByLocation() {
-    if (import_epdoc_util4.isNonEmptyArray(this._locations) && import_epdoc_util4.isNonEmptyArray(this._items) && this._items.length > 1) {
-      this._items.sort((a, b) => {
-        let adx = this._locations.indexOf(a.location);
-        let bdx = this._locations.indexOf(b.location);
-        return adx < bdx ? -1 : bdx < adx ? 1 : 0;
-      });
-    }
-    return this;
-  }
-  found() {
-    return import_epdoc_util4.isNonEmptyArray(this._items);
-  }
-  numFound() {
-    return this.found() ? this._items.length : 0;
-  }
-  orderedByTime() {
-    let result = false;
-    if (import_epdoc_util4.isNonEmptyArray(this._items) && this._items.length > 1) {
-      result = true;
-      for (let mdx = 0;mdx < this._items.length - 1; ++mdx) {
-        if (this._items[mdx].time > this._items[mdx + 1].time) {
-          return false;
-        }
-      }
-    }
-    return result;
-  }
-  moving() {
-    return this.sortByLocation().orderedByTime();
-  }
-  toString(tNow) {
-    tNow = tNow ? tNow : new Date().getTime();
-    let result = [];
-    if (import_epdoc_util4.isArray(this._items)) {
-      for (let idx = 0;idx < this._items.length; ++idx) {
-        result.push(LocationHistory._itemToString(this._items[idx], tNow));
-      }
-    }
-    return `(${this._person}) ` + JSON.stringify(result);
-  }
-}
-
 // src/location-history.ts
+var import_epdoc_util4 = __toESM(require_dist(), 1);
 function newLocationHistory(options) {
   return new LocationHistory(options);
 }
@@ -1175,8 +1052,8 @@ class LocationHistory extends FunctionLog {
   setStorage = null;
   constructor(options) {
     super(options);
-    this.getStorage = import_epdoc_util5.isFunction(options.getStorage) ? options.getStorage : null;
-    this.setStorage = import_epdoc_util5.isFunction(options.setStorage) ? options.setStorage : null;
+    this.getStorage = import_epdoc_util4.isFunction(options.getStorage) ? options.getStorage : null;
+    this.setStorage = import_epdoc_util4.isFunction(options.setStorage) ? options.setStorage : null;
     this.read();
   }
   read() {
@@ -1187,7 +1064,7 @@ class LocationHistory extends FunctionLog {
   }
   add(person, location, time) {
     let oldItems = this.history[person];
-    if (!import_epdoc_util5.isArray(oldItems)) {
+    if (!import_epdoc_util4.isArray(oldItems)) {
       oldItems = [];
     }
     let newItems = [];
@@ -1203,7 +1080,7 @@ class LocationHistory extends FunctionLog {
     return this;
   }
   filter(person) {
-    return new HistoryFilter(person, import_epdoc_util5.isArray(this.history[person]) ? this.history[person] : []);
+    return new HistoryFilter(person, import_epdoc_util4.isArray(this.history[person]) ? this.history[person] : []);
   }
   person(person) {
     return this.filter(person);
@@ -1212,7 +1089,7 @@ class LocationHistory extends FunctionLog {
     Object.keys(this.history).forEach((key) => {
       const items = this.history[key];
       let newItems = [];
-      if (import_epdoc_util5.isArray(items)) {
+      if (import_epdoc_util4.isArray(items)) {
         for (let idx = 0;idx < items.length; ++idx) {
           const item = items[idx];
           if (tCutoff < item.time) {
@@ -1220,7 +1097,7 @@ class LocationHistory extends FunctionLog {
           }
         }
       }
-      if (!import_epdoc_util5.isArray(items) || newItems.length !== items.length) {
+      if (!import_epdoc_util4.isArray(items) || newItems.length !== items.length) {
         this.history[key] = newItems;
         this.dirty = true;
       }
@@ -1242,7 +1119,7 @@ class LocationHistory extends FunctionLog {
     Object.keys(this.history).forEach((key) => {
       const items = this.history[key];
       result[key] = [];
-      if (import_epdoc_util5.isArray(items)) {
+      if (import_epdoc_util4.isArray(items)) {
         for (let idx = 0;idx < items.length; ++idx) {
           result[key].push(LocationHistory._itemToString(items[idx], tNow));
         }
@@ -1258,12 +1135,90 @@ class LocationHistory extends FunctionLog {
   }
 }
 
-// src/index.ts
-function version() {
-  return package_default.version;
+// src/history-filter.ts
+class HistoryFilter {
+  _person;
+  _items = [];
+  _locations = [];
+  _tCutoffMs;
+  constructor(person, items) {
+    this._person = person;
+    this._items = import_epdoc_util5.deepCopy(items);
+  }
+  cutoff(tCutoffMs) {
+    this._tCutoffMs = tCutoffMs;
+    if (import_epdoc_util5.isNonEmptyArray(this._items)) {
+      let newItems = [];
+      for (let idx = 0;idx < this._items.length; ++idx) {
+        const item = this._items[idx];
+        if (this._tCutoffMs < item.time) {
+          newItems.push(item);
+        }
+      }
+      this._items = newItems;
+    }
+    return this;
+  }
+  locations(locations) {
+    this._locations = import_epdoc_util5.isArray(locations) ? locations : [locations];
+    if (import_epdoc_util5.isNonEmptyArray(this._items) && import_epdoc_util5.isNonEmptyArray(this._locations)) {
+      let newItems = [];
+      for (let ldx = 0;ldx < this._locations.length; ++ldx) {
+        const location = this._locations[ldx];
+        for (let idx = 0;idx < this._items.length; ++idx) {
+          const item = this._items[idx];
+          if (location === item.location) {
+            newItems.push(item);
+          }
+        }
+      }
+      this._items = newItems;
+    }
+    return this;
+  }
+  sortByLocation() {
+    if (import_epdoc_util5.isNonEmptyArray(this._locations) && import_epdoc_util5.isNonEmptyArray(this._items) && this._items.length > 1) {
+      this._items.sort((a, b) => {
+        let adx = this._locations.indexOf(a.location);
+        let bdx = this._locations.indexOf(b.location);
+        return adx < bdx ? -1 : bdx < adx ? 1 : 0;
+      });
+    }
+    return this;
+  }
+  found() {
+    return import_epdoc_util5.isNonEmptyArray(this._items);
+  }
+  numFound() {
+    return this.found() ? this._items.length : 0;
+  }
+  orderedByTime() {
+    let result = false;
+    if (import_epdoc_util5.isNonEmptyArray(this._items) && this._items.length > 1) {
+      result = true;
+      for (let mdx = 0;mdx < this._items.length - 1; ++mdx) {
+        if (this._items[mdx].time > this._items[mdx + 1].time) {
+          return false;
+        }
+      }
+    }
+    return result;
+  }
+  moving() {
+    return this.sortByLocation().orderedByTime();
+  }
+  toString(tNow) {
+    tNow = tNow ? tNow : new Date().getTime();
+    let result = [];
+    if (import_epdoc_util5.isArray(this._items)) {
+      for (let idx = 0;idx < this._items.length; ++idx) {
+        result.push(LocationHistory._itemToString(this._items[idx], tNow));
+      }
+    }
+    return `(${this._person}) ` + JSON.stringify(result);
+  }
 }
 export {
-  version,
   setFan,
   newSwitchService,
   newService,
@@ -1271,16 +1226,23 @@ export {
   newLightService,
   newHA,
   newFanSpeed6Service,
+  newFanService,
   newCoverService,
   newAlarmService,
+  isLogFunction,
   isFanSpeed6Speed,
   isAlarmServiceArmType,
   SwitchService,
   Service,
   LocationHistory,
   LightService,
+  HistoryFilter,
   HA,
+  FunctionLog,
   FanSpeed6Service,
+  FanService,
+  EntityState,
+  Entity,
   CoverService,
   AlarmService
 };

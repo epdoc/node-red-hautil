@@ -2,14 +2,16 @@ This documents a few strategies for including reusable code in Node-RED.
 
 ## ES6 and Typescript Code Compatibility with Node-RED
 
-The code in this repository is written in ECMAScript 2015 (ES6). This code will
-work in Node-RED, but NODE-RED will not import ES6 modules.
+The code in this repository is written in Typescript, tested and bundled with
+[bun](https://bun.sh/). This code will work in Node-RED, but not using the standard loading technique. Bun currently does not create modules that can be nested loaded, and so we do things a bit differently here.
+
+~ NODE-RED will not import ES6 modules.
 [Babel](https://babeljs.io/docs/babel-plugin-transform-modules-commonjs) was
 used in this project to convert the ES6 modules to CommonJS that can be loaded
-using `require`.
+using `require`. ~
 
-Equally, you can use transpiled Typescript code, as I have shown when I add my
-[general utilities package](https://github.com/jpravetz/epdoc-util) to Node-RED.
+~ Equally, you can use transpiled Typescript code, as I have shown when I add my
+[general utilities package](https://github.com/jpravetz/epdoc-util) to Node-RED. ~
 
 For classes it is perhaps easiest to add a constructor method outside of the
 scope of the class:
@@ -170,14 +172,40 @@ I found it easist to [load my modules and attach them to the global
 context](https://nodered.org/docs/user-guide/writing-functions#loading-additional-modules).
 Otherwise you are repeating setup to add your packages to every function. 
 
-Here
-are the required changes to `settings.json`:
+For libraries that you can include using `require`, here are the required
+changes to `settings.json`:
 
-```json
+```js
+module.export = {
+  // other stuff, not shown here
+
   functionGlobalContext: {
     "epdoc-node-red-utils": require('epdoc-node-red-utils'),
     "epdoc-util": require('epdoc-util')
-  },
+  }
+};
+```
+
+For libraries that need to be imported, I use the following modified `settings.js` code:
+
+```js
+let settings = {
+  // other stuff, not shown here
+
+  functionGlobalContext: {
+    "moment": require('moment')   // moment can use require
+  }
+}
+
+function loadModules() {
+  settings.functionGlobalContext["epdoc-util"] = await import('epdoc-utils');
+  settings.functionGlobalContext[]"epdoc-node-red-utils"] = await import('epdoc-node-red-utils');
+}
+
+loadModules();
+
+module.exports = settings;
+
 ```
 
 Then, to use this code in other function, it's again a matter of accessing the global context:

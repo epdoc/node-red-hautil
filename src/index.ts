@@ -1,19 +1,16 @@
-import pkg from '../package.json';
-
-export * from './alarm-service.js';
-export * from './cover-service.js';
-export * from './fan-speed6-service.js';
-export * from './fan.js';
-export * from './ha.js';
-export * from './light-service.js';
-export * from './location-history.js';
-export * from './service.js';
-export * from './switch-service.js';
-
-/**
- * The module version number, to make sure Node-RED loaded the right version.
- * @returns Package version number
- */
-export function version() {
-  return pkg.version;
-}
+export * from './alarm-service';
+export * from './cover-service';
+export * from './entity';
+export * from './entity-state';
+export * from './fan';
+export * from './fan-service';
+export * from './fan-speed6-service';
+export * from './function-log';
+export * from './ha';
+export * from './history-filter';
+export * from './index';
+export * from './light-service';
+export * from './location-history';
+export * from './service';
+export * from './switch-service';
+export * from './types';
