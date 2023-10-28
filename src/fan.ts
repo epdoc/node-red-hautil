@@ -39,6 +39,7 @@ export function setFan(gHA: GlobalHomeAssistant, fnSend: NodeSendFunction, param
   const DELAY = isNonEmptyArray(opts.delay) ? opts.delay : [1000, 3000];
 
   const ha: HA = new HA(gHA, opts as LogOpts);
+  ha.warn(`setFan input params: ${JSON.stringify(params)}`);
   const bShutoff = isNonEmptyString(params.shutOffEntityId) ? ha.entity(params.shutOffEntityId).isOn() : false;
 
   const swutch: Entity = ha.entity(switch_id);
@@ -61,6 +62,8 @@ export function setFan(gHA: GlobalHomeAssistant, fnSend: NodeSendFunction, param
     bOff = service === 'off';
   }
   const timeout = parseInt(params.timeout as unknown as string, 10);
+
+  ha.warn(`setFan bOn=${bOn} bOff=${bOff} speed=${speed} service=${service} timeout=${timeout}`);
 
   // const currentPct = ha.getEntitySpeed(fan_id);
 

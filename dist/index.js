@@ -954,6 +954,7 @@ function setFan(gHA, fnSend, params, opts) {
   const switch_id = fan_id;
   const DELAY = import_epdoc_util3.isNonEmptyArray(opts.delay) ? opts.delay : [1000, 3000];
   const ha2 = new HA(gHA, opts);
+  ha2.warn(`setFan input params: ${JSON.stringify(params)}`);
   const bShutoff = import_epdoc_util3.isNonEmptyString(params.shutOffEntityId) ? ha2.entity(params.shutOffEntityId).isOn() : false;
   const swutch = ha2.entity(switch_id);
   function fanState() {
@@ -973,6 +974,7 @@ function setFan(gHA, fnSend, params, opts) {
     bOff = service4 === "off";
   }
   const timeout = parseInt(params.timeout, 10);
+  ha2.warn(`setFan bOn=${bOn} bOff=${bOff} speed=${speed} service=${service4} timeout=${timeout}`);
   let bTurnedOn = false;
   return Promise.resolve().then((resp) => {
     ha2.warn(`${switch_id} is ${swutch.state()}`);
