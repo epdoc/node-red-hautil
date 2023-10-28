@@ -968,7 +968,8 @@ function setFan(gHA, fnSend, params, opts) {
     speed = params.speed;
   } else if (import_epdoc_util3.isNumber(params.percentage)) {
     speed = FanSpeed6Service.percentageToSpeed(params.percentage);
-  } else if (import_epdoc_util3.isString(params.service) && REG.onoff.test(params.service)) {
+  }
+  if (import_epdoc_util3.isString(params.service) && REG.onoff.test(params.service)) {
     service4 = params.service;
     bOn = service4 === "on";
     bOff = service4 === "off";
