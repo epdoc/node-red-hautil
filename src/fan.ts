@@ -56,7 +56,8 @@ export function setFan(gHA: GlobalHomeAssistant, fnSend: NodeSendFunction, param
     speed = params.speed;
   } else if (isNumber(params.percentage)) {
     speed = FanSpeed6Service.percentageToSpeed(params.percentage);
-  } else if (isString(params.service) && REG.onoff.test(params.service)) {
+  }
+  if (isString(params.service) && REG.onoff.test(params.service)) {
     service = params.service;
     bOn = service === 'on';
     bOff = service === 'off';

@@ -1,6 +1,6 @@
 {
   "name": "epdoc-node-red-utils",
-  "version": "0.15.2",
+  "version": "0.15.3",
   "description": "Node-RED utils for Home Assistant",
   "private": false,
   "modules": "src/index.ts",
