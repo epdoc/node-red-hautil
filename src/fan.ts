@@ -9,7 +9,7 @@ const REG = {
   onoff: new RegExp(/^(on|off)$/, 'i'),
 };
 
-export type NodeSendFunction = (any) => {};
+export type NodeSendFunction = (msg: any) => {};
 export type SetFanParams = {
   fan: EntityShortId;
   speed?: FanSpeed6Speed;
@@ -30,27 +30,6 @@ export type SetFanOpts = LogOpts & {
  * boolean that will keep the fan off. This can be used, for example, when there
  * is a lightning storm and you wish to keep the fan switched off at it's
  * switch.
- * @param {Object} gHA Should be set to the return value of
- *  `global.get('homeassistant')`.
- * @param {Function} fnSend Callback to send a payload to the Call Service node.
- * @param {string} params.fan - short name of fan (eg. 'master_bedroom')
- * @param {number} params.speed Sets the speed of the fan, in the range 1 to 6.
- * Setting the fan speed to 0 will turn off fan, unless params.service is 'on'
- * @param {number} params.percentage Can be used instead of `speed`. `speed`
- * takes precedence.
- * @param {string} params.service When you just want to turn the fan on or off
- * without altering speed. Must be `on` or `off`.
- * @param {milliseconds} params.timeout Use in conjunction with service 'on' to turn
- * the fan 'off' after timeout milliseconds. A value of 0 is ignored.
- * @param {Array} opts.delay An array of two delays, in milliseconds, to use
- * when setting the fan speed. These are used to set the speed delay[0] ms after
- * a fan is first tunred on, and again delay[1] ms later. This ensures that the
- * fan is on before the RF control signal is sent. Defaults to [1000, 3000].
- * @param {Function} opts.log A gunction that takes a msg and returns a promise
- * and that can be used to log debug message.
- * @param {string} opts.shutoff_entity_id The entity_id of an entity that
- * indicates that the fan should remain off (eg. during a lightning storm)
- * @returns
  */
 export function setFan(gHA: GlobalHomeAssistant, fnSend: NodeSendFunction, params: SetFanParams, opts: SetFanOpts) {
   // const switch_id = "switch." + fan + "_fan_switch";

@@ -9,14 +9,15 @@ General purpose utilities for use with [Node-RED](https://nodered.org/) and
 Utilities for my personal use of Node-RED with Home Assistant. Included are:
 
  * A `setFan` function that is specific to my RF control of fans using both a
-   [Bond Bridge](https://bondhome.io/product/bond-bridge/) to control speed, and
-   wall switches to decouple the fans from power when they are off. I do this to
-   prevent mains noise from blowing the delicate controllers on my Minka fans.
+   [Bond Bridge](https://bondhome.io/product/bond-bridge/) to control speed (0
+   to 6), and wall switches to decouple the fans from power when they are off. I
+   do this to prevent mains noise from blowing the susceptible controllers on my
+   Minka fans.
  * `LocationHistory` and `LocationMoving` classes that I use to monitor movement
-   from our house, for gate automation purposes. These are at a pre-release
-   level of quality.
+   from our house, for gate automation purposes. _These are at a pre-release
+   level of quality._
 
-## Code Notes
+## Developer Notes
 
 This module was originally written in ES6 and transpiled using Babel to generate
 a module that could be loaded using `require` or `import`. Soon thereafter it
@@ -26,6 +27,14 @@ testing. Bun generates a different type of module that can only be loaded in
 Node-RED using a [dynamic
 import](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import),
 as you will see in the next section.
+
+```bash
+git clone epdoc-node-red-utils
+cd epdoc-node-red-utils
+bun install
+bun test
+bun run build
+```
 
 ## Installation and Use
 
@@ -91,8 +100,9 @@ including `SwitchService`, `LightService`, `AlarmService`, `CoverService`,
 [Bond Bridge](https://bondhome.io/product/bond-bridge/) to set the fan speed and
 a smart switch to turn the fans on and off. 
 
-There is the possibility for many more subclasses, or you can build your service
-payload directly using the base `Service` class, or one of the other subclasses. 
+There is the possibility for many more subclasses to be written, or you can
+build your service payload directly using the base `Service` class, or one of
+the other subclasses. 
 
 The following shows the code for a [function
 node](https://nodered.org/docs/user-guide/writing-functions) that uses three
