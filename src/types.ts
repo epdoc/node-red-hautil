@@ -38,12 +38,20 @@ export type NodeRedNodeObject = {
   send: NodeRedSendFunction;
   done: () => void;
 };
+/**
+ * Node-RED environment information.
+ */
 export type NodeRedOpts = {
   env: NodeRedEnvObject;
   flow: NodeRedFlowObject;
   global: NodeRedGlobalObject;
   node: NodeRedNodeObject;
 };
+/**
+ * Type guard. Tests if val is a valid NodeRedOpts object.
+ * @param val
+ * @returns
+ */
 export function isNodeRedOpts(val: any): val is NodeRedOpts {
-  return isDict(val) && val.node && val.flow && val.env;
+  return isDict(val) && isDict(val.node) && isDict(val.flow) && isDict(val.env) && isDict(val.global);
 }
