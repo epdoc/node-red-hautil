@@ -1,42 +1,26 @@
 import { describe, expect, it } from 'bun:test';
 import { isDict, isObject } from 'epdoc-util';
-import {
-  HA,
-  HaSensorDict,
-  NodeRedOpts,
-  NodeRedOptsMockData,
-  createNodeRedOptsMock,
-  newFanSpeed6Service,
-  newService,
-} from '../src';
+import { HA, HaSensorDict, NodeRedOptsMock, newFanSpeed6Service, newService } from '../src';
 
-describe('entity', () => {
-  describe('group1', () => {
-    const mock: NodeRedOptsMockData = {
-      env: {},
-      flow: {},
-      global: {
-        homeassistant: {
-          states: {
-            entity4: {
-              state: '3.22',
-            },
-            entity3: {
-              state: '3.22',
-            },
-            entity2: {
-              state: 'on',
-            },
-            entity1: {
-              state: 'off',
-            },
-          },
-        },
+describe('ha', () => {
+  const mock: NodeRedOptsMock = new NodeRedOptsMock();
+
+  describe('entity', () => {
+    mock.setStates({
+      entity4: {
+        state: '3.22',
       },
-      node: {},
-    };
-    const opts: NodeRedOpts = createNodeRedOptsMock(mock);
-    let ha = new HA(opts);
+      entity3: {
+        state: '3.22',
+      },
+      entity2: {
+        state: 'on',
+      },
+      entity1: {
+        state: 'off',
+      },
+    });
+    let ha = new HA(mock.opts);
 
     it('isEntityOn', () => {
       expect(ha.entity('entity2').isOn()).toEqual(true);
@@ -71,35 +55,27 @@ describe('entity', () => {
       }
     });
   });
-});
 
-describe('service payload', () => {
-  const mock: NodeRedOptsMockData = {
-    env: {},
-    flow: {},
-    global: {},
-    node: {},
-  };
-  const opts: NodeRedOpts = createNodeRedOptsMock(mock);
-
-  it('light on', () => {
-    const s = newService('light.entity3', opts);
-    const p = s.service('turn_on').payload();
-    expect(isObject(p)).toEqual(true);
-    expect(p).toEqual({
-      target: { entity_id: 'light.entity3' },
-      domain: 'light',
-      service: 'turn_on',
+  describe('service payload', () => {
+    it('light on', () => {
+      const s = newService('light.entity3', mock.opts);
+      const p = s.service('turn_on').payload();
+      expect(isObject(p)).toEqual(true);
+      expect(p).toEqual({
+        target: { entity_id: 'light.entity3' },
+        domain: 'light',
+        service: 'turn_on',
+      });
     });
-  });
-  it('fan speed', () => {
-    const p = newFanSpeed6Service('entity4', opts).speed(3).payload();
-    expect(isObject(p)).toEqual(true);
-    expect(p).toEqual({
-      target: { entity_id: 'fan.entity4' },
-      domain: 'fan',
-      service: 'set_percentage',
-      data: { percentage: 50 },
+    it('fan speed', () => {
+      const p = newFanSpeed6Service('entity4', mock.opts).speed(3).payload();
+      expect(isObject(p)).toEqual(true);
+      expect(p).toEqual({
+        target: { entity_id: 'fan.entity4' },
+        domain: 'fan',
+        service: 'set_percentage',
+        data: { percentage: 50 },
+      });
     });
   });
 });

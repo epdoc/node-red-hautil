@@ -1,10 +1,11 @@
 {
   "name": "epdoc-node-red-hautil",
-  "version": "0.15.3",
+  "version": "0.16.2",
   "description": "General Purpose Node-RED utils for Home Assistant",
   "private": false,
   "modules": "src/index.ts",
   "type": "module",
+  "main": "dist/index.js",
   "keywords": [
     "util",
     "nodered",
@@ -15,21 +16,20 @@
     "name": "James Pravetz",
     "email": "jpravetz@epdoc.com"
   },
-  "main": "dist/index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jpravetz/epdoc-node-red-util.git"
+    "url": "git+https://github.com/jpravetz/epdoc-node-red-hautil.git"
   },
   "scripts": {
-    "build": "bun build ./src/index.ts --target node --outdir ./dist && bun run build:declaration",
-    "build:declaration": "tsc --emitDeclarationOnly",
+    "build_failed": "bun build ./src/index.ts --target node --outdir ./dist && tsc",
+    "build": "tsc",
     "clean": "rm -rf dist docs && echo 'Done.'",
     "coverage": "bun test --coverage",
     "format": "prettier --write 'src/**/*.ts'",
     "docs": "./node_modules/typedoc/bin/typedoc"
   },
   "devDependencies": {
-    "eslint": "^8.49.0",
+    "eslint": "^8.52.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",
     "prettier": "^3.0.3",

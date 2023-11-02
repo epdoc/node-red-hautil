@@ -1,5 +1,14 @@
 {
   "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "declaration": true,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "resolveJsonModule": true,
+    "esModuleInterop": true
+  },
+  "y_compilerOptions": {
     "lib": ["ESNext"],
     "module": "esnext",
     "target": "esnext",
@@ -25,5 +34,9 @@
     "out": "docs"
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules"],
+  "x_compilerOptions": {
+    "x_outFile": "./dist/index.ts",
+    "x_emitDeclarationOnly": true
+  }
 }

@@ -11,8 +11,11 @@ General purpose utilities for use with [Node-RED](https://nodered.org/) and
 This module was originally written in ES6 and transpiled using Babel to generate
 a module that could be loaded using `require` or `import`. Soon thereafter it
 was migrated to TypeScript (developer hint: this resulted in catching quite a
-few bugs). It was also migrated to [Bun](https://bun.sh/) for build and unit
-testing. Bun generates a different type of module that can only be loaded in
+few bugs). It was also migrated to [Bun](https://bun.sh/) for package management
+and unit testing, however the Typescript Compiler (tsc) is used for module
+generation, due to limitations in bun's bundling options . 
+
+OUTDATED SINCE MOVING TO TSC: Bun generates a different type of module that can only be loaded in
 Node-RED using a [dynamic
 import](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import),
 as you will see in the next section.
