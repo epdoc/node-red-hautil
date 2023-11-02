@@ -29,15 +29,17 @@
     "docs": "./node_modules/typedoc/bin/typedoc"
   },
   "devDependencies": {
+    "bun-types": "latest",
     "eslint": "^8.52.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",
+    "eslint-plugin-prefer-arrow": "^1.2.3",
+    "eslint-plugin-unicorn": "^49.0.0",
     "prettier": "^3.0.3",
-    "bun-types": "latest"
+    "typedoc": "^0.25.3"
   },
   "dependencies": {
-    "epdoc-util": "^0.2.6",
-    "typedoc": "^0.25.3"
+    "epdoc-util": "^0.2.6"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
