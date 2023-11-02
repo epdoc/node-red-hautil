@@ -1,7 +1,7 @@
-import { LogOpts, Service } from './service';
-import { EntityDomain, EntityId } from './types';
+import { Service } from './service';
+import { EntityDomain, EntityId, NodeRedOpts } from './types';
 
-export function newSwitchService(entity_id: EntityId, opts: LogOpts) {
+export function newSwitchService(entity_id: EntityId, opts?: NodeRedOpts): SwitchService {
   return new SwitchService(entity_id, opts);
 }
 
@@ -19,7 +19,7 @@ export class SwitchService extends Service {
    * Shortcut to set service to turn_on.
    * @returns
    */
-  on(): SwitchService {
+  on(): this {
     this._payload.service = 'turn_on';
     return this;
   }
@@ -28,7 +28,7 @@ export class SwitchService extends Service {
    * Shortcut to set service to turn_off.
    * @returns
    */
-  off(): SwitchService {
+  off(): this {
     this._payload.service = 'turn_off';
     return this;
   }

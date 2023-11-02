@@ -1,14 +1,13 @@
 import { Entity } from './entity';
 import { EntityState } from './entity-state';
-import { FunctionLog, LogOpts } from './function-log';
-import { EntityId } from './types';
+import { FunctionNodeBase } from './function-node-base';
+import { EntityId, NodeRedOpts } from './types';
 
-export type GlobalHomeAssistant = any;
 export type HomeAssistant = any;
 export type HaSensorDictEntry = {
   id: EntityId;
   name?: string;
-  type: 'number' | 'boolean' | 'int' | 'integer' | undefined;
+  type?: 'number' | 'boolean' | 'int' | 'integer';
   entity?: Entity;
   val?: number | string;
   on?: boolean;
@@ -17,14 +16,14 @@ export type HaSensorDictEntry = {
 };
 export type HaSensorDict = Record<string, HaSensorDictEntry>;
 
-export function newHA(globalHomeAssistant: GlobalHomeAssistant, opts: LogOpts) {
-  return new HA(globalHomeAssistant, opts);
+export function newHA(opts: NodeRedOpts) {
+  return new HA(opts);
 }
 
 /**
  * Class wraps a home assistant object, for use in Node-RED functions.
  */
-export class HA extends FunctionLog {
+export class HA extends FunctionNodeBase {
   protected _ha: HomeAssistant;
 
   /**
@@ -32,9 +31,9 @@ export class HA extends FunctionLog {
    * @param {Object} globalHomeAssistant The value of global.get('homeassistant')
    * @param {Function} options.log Function that takes a string as a parameter and that outputs log messages.
    */
-  constructor(globalHomeAssistant: GlobalHomeAssistant, opts?: LogOpts) {
+  constructor(opts: NodeRedOpts) {
     super(opts);
-    this._ha = globalHomeAssistant.homeAssistant;
+    this._ha = this.global.get('homeassistant');
   }
 
   get ha(): HomeAssistant {

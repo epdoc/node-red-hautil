@@ -34,7 +34,7 @@ export class Entity {
     return this.asInt(defval);
   }
 
-  speed(defval) {
+  speed(defval?: Integer) {
     if (this._entity && this._entity.attributes && this._entity.attributes.percentage) {
       return FanSpeed6Service.percentageToSpeed(parseInt(this._entity.attributes.percentage, 10));
     }

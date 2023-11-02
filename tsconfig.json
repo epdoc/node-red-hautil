@@ -3,21 +3,27 @@
     "lib": ["ESNext"],
     "module": "esnext",
     "target": "esnext",
+    "outDir": "./dist",
+    "declaration": true,
+    "sourceMap": true,
     "moduleResolution": "bundler",
     "moduleDetection": "force",
-    "allowImportingTsExtensions": true,
-    "noEmit": true,
     "composite": true,
     "strict": true,
     "downlevelIteration": true,
     "skipLibCheck": true,
-    "jsx": "react-jsx",
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "allowJs": true,
+    "esModuleInterop": true,
     "types": [
       "bun-types" // add Bun global
     ]
-  }
+  },
+  "typedocOptions": {
+    "entryPoints": ["src/index.ts"],
+    "out": "docs"
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules"]
 }

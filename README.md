@@ -1,21 +1,10 @@
-# epdoc-node-red-utils
+# epdoc-node-red-hautil
 
 General purpose utilities for use with [Node-RED](https://nodered.org/) and
 [Home Assistant](https://www.home-assistant.io/).
 
  * `Service` wrapper, to generate payloads for use with the Call Service node.
  * `HA` wrapper, to retrieve state from home assistant
-
-Utilities for my personal use of Node-RED with Home Assistant. Included are:
-
- * A `setFan` function that is specific to my RF control of fans using both a
-   [Bond Bridge](https://bondhome.io/product/bond-bridge/) to control speed (0
-   to 6), and wall switches to decouple the fans from power when they are off. I
-   do this to prevent mains noise from blowing the susceptible controllers on my
-   Minka fans.
- * `LocationHistory` and `LocationMoving` classes that I use to monitor movement
-   from our house, for gate automation purposes. _These are at a pre-release
-   level of quality._
 
 ## Developer Notes
 
@@ -29,8 +18,8 @@ import](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operat
 as you will see in the next section.
 
 ```bash
-git clone epdoc-node-red-utils
-cd epdoc-node-red-utils
+git clone epdoc-node-red-hautil
+cd epdoc-node-red-hautil
 bun install
 bun test
 bun run build
@@ -43,7 +32,7 @@ to add this dependency to the Node-RED `package.json` file and restart Node-RED.
 Node-RED is restarted from _Settings > Add-ons > Node-Red_. The restart should
 cause the module to be installed and available. For module updates you can edit
 the version number in `package.json`, delete
-`node_modules/epdoc-node-red-utils`, then restart Node-RED.
+`node_modules/epdoc-node-red-hautil`, then restart Node-RED.
 
 For convenience you can add the module to globals, so that you don't need
 to specify the module in each `Function Node` where it is used.  Here are the
@@ -59,8 +48,8 @@ let settings = {
 
 // Must use dynamic import because of the nature of how bun generates this module
 async function loadModules() {
-  const utils = await import('epdoc-node-red-utils');
-  settings.functionGlobalContext['epdoc-node-red-utils'] = utils;
+  const utils = await import('epdoc-node-red-hautil');
+  settings.functionGlobalContext['epdoc-node-red-hautil'] = utils;
 }
 
 loadModules();
@@ -76,7 +65,7 @@ node](https://zachowj.github.io/node-red-contrib-home-assistant-websocket/node/c
 
 
 ```javascript
-const u = global.get("epdoc-node-red-utils");
+const u = global.get("epdoc-node-red-hautil");
 const payload = u.newLightService('master_bedroom').on().payload();
 node.send([null,{payload:payload}]);
 node.send([msg,null]);
@@ -91,7 +80,7 @@ libraries in Node-RED [here](./NODE-RED.md).
 ## Service Class
 
 The
-[Service](https://github.com/jpravetz/epdoc-node-red-utils/blob/master/src/service.ts)
+[Service](https://github.com/jpravetz/epdoc-node-red-hautil/blob/master/src/service.ts)
 object is used to build a payload that can be passed to the [Call Service
 node](https://zachowj.github.io/node-red-contrib-home-assistant-websocket/node/call-service.html).
 Provided too are a number of subclasses for specific types of entities,
@@ -149,7 +138,7 @@ return msg;
 ## HA Class
 
 The
-[HA](https://github.com/jpravetz/epdoc-node-red-utils/blob/master/src/service.tsbond)
+[HA](https://github.com/jpravetz/epdoc-node-red-hautil/blob/master/src/service.tsbond)
 class is again meant for use in Function Nodes. It provides a wrapper for a Home
 Assistant instance, and has methods to access the state of Home Assitant
 entities.

@@ -1,11 +1,15 @@
+import { describe, expect, it } from 'bun:test';
 import { isObject } from 'epdoc-util';
 import {
   AlarmService,
   CoverService,
   FanSpeed6Service,
   LightService,
+  NodeRedOpts,
+  NodeRedOptsMockData,
   Service,
   SwitchService,
+  createNodeRedOptsMock,
   newAlarmService,
   newCoverService,
   newFanSpeed6Service,
@@ -35,8 +39,16 @@ describe('service', () => {
       });
     });
     describe('fan', () => {
+      const mock: NodeRedOptsMockData = {
+        env: {},
+        flow: {},
+        global: {},
+        node: {},
+      };
+      const opts: NodeRedOpts = createNodeRedOptsMock(mock);
+
       it('speed', () => {
-        const fan = new FanSpeed6Service('other_room');
+        const fan = new FanSpeed6Service('other_room', opts);
         const payload = fan.speed(4).payload();
         expect(isObject(payload)).toEqual(true);
         expect(payload).toEqual({
@@ -49,7 +61,7 @@ describe('service', () => {
         });
       });
       it('on', () => {
-        const payload = newFanSpeed6Service('more_rooms').on().payload();
+        const payload = newFanSpeed6Service('more_rooms', opts).on().payload();
         expect(isObject(payload)).toEqual(true);
         expect(payload).toEqual({
           target: { entity_id: 'fan.more_rooms' },
@@ -58,7 +70,7 @@ describe('service', () => {
         });
       });
       it('percentage', () => {
-        const fan = newFanSpeed6Service('less_rooms');
+        const fan = newFanSpeed6Service('less_rooms', opts);
         const payload = fan.percentage(50).payload();
         expect(isObject(payload)).toEqual(true);
         expect(payload).toEqual({
@@ -72,7 +84,7 @@ describe('service', () => {
       });
       describe('light', () => {
         it('on', () => {
-          const light = new LightService('master_bedroom');
+          const light = new LightService('master_bedroom', opts);
           let payload = light.on().payload();
           expect(isObject(payload)).toEqual(true);
           expect(payload).toEqual({
@@ -82,7 +94,7 @@ describe('service', () => {
           });
         });
         it('off', () => {
-          const light = new LightService('light.master_bedroom');
+          const light = new LightService('light.master_bedroom', opts);
           let payload = light.domain('light').off().payload();
           expect(isObject(payload)).toEqual(true);
           expect(payload).toEqual({
@@ -94,7 +106,7 @@ describe('service', () => {
       });
       describe('switch', () => {
         it('on', () => {
-          const payloadBuilder = new SwitchService('master_bedroom');
+          const payloadBuilder = new SwitchService('master_bedroom', opts);
           let payload = payloadBuilder.on().payload();
           expect(isObject(payload)).toEqual(true);
           expect(payload).toEqual({
@@ -104,7 +116,7 @@ describe('service', () => {
           });
         });
         it('off', () => {
-          const payload = newSwitchService('switch.master_bedroom').off().payload();
+          const payload = newSwitchService('switch.master_bedroom', opts).off().payload();
           expect(isObject(payload)).toEqual(true);
           expect(payload).toEqual({
             target: { entity_id: 'switch.master_bedroom' },
@@ -115,7 +127,7 @@ describe('service', () => {
       });
       describe('input_number', () => {
         it('value', () => {
-          const payloadBuilder = new Service('input_number.master_bedroom');
+          const payloadBuilder = new Service('input_number.master_bedroom', opts);
           let payload = payloadBuilder.value(32.3).payload();
           expect(isObject(payload)).toEqual(true);
           expect(payload).toEqual({

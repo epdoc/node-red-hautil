@@ -592,26 +592,44 @@ var require_dist = __commonJS((exports) => {
   exports.Util = Util;
 });
 
-// src/function-log.ts
-var import_epdoc_util = __toESM(require_dist(), 1);
-function isLogFunction(val) {
-  return import_epdoc_util.isFunction(val);
-}
-
-class FunctionLog {
-  info = () => {
-  };
-  warn = () => {
-  };
+// src/function-node-base.ts
+class FunctionNodeBase {
+  env;
+  flow;
+  global;
+  node;
   constructor(opts) {
-    this.initLog(opts);
+    this.env = opts ? opts.env : { get: (key) => {
+    } };
+    this.flow = opts ? opts.flow : {
+      get: (key, type) => {
+      },
+      set: (key, data, type) => {
+      }
+    };
+    this.global = opts ? opts.global : {
+      get: (key, type) => {
+      },
+      set: (key, data, type) => {
+      }
+    };
+    this.node = opts ? opts.node : {
+      warn: (msg) => {
+      },
+      error: (msg) => {
+      },
+      debug: (msg) => {
+      },
+      log: (msg) => {
+      },
+      send: (...args) => {
+      },
+      done: () => {
+      }
+    };
   }
-  initLog(opts) {
-    if (import_epdoc_util.isDict(opts)) {
-      this.warn = isLogFunction(opts.warn) ? opts.warn : this.warn;
-      this.info = isLogFunction(opts.info) ? opts.info : this.info;
-    }
-    return this;
+  warn(...args) {
+    return this.node.warn(...args);
   }
 }
 
@@ -620,7 +638,7 @@ function newService(entity_id, opts) {
   return new Service(entity_id, opts);
 }
 
-class Service extends FunctionLog {
+class Service extends FunctionNodeBase {
   _payload = { target: { entity_id: "" } };
   constructor(entity_id, opts) {
     super(opts);
@@ -687,7 +705,7 @@ function isAlarmServiceArmType(val) {
   return ARMTYPE.hasOwnProperty(val);
 }
 function newAlarmService(entity_id, opts) {
-  return new Service(entity_id, opts);
+  return new AlarmService(entity_id, opts);
 }
 var ARMTYPE = {
   away: "alarm_arm_away",
@@ -774,7 +792,7 @@ class EntityState {
 }
 
 // src/fan-speed6-service.ts
-var import_epdoc_util2 = __toESM(require_dist(), 1);
+var import_epdoc_util = __toESM(require_dist(), 1);
 
 // src/switch-service.ts
 function newSwitchService(entity_id, opts) {
@@ -835,7 +853,7 @@ class FanService extends LightService {
 
 // src/fan-speed6-service.ts
 function isFanSpeed6Speed(val) {
-  return import_epdoc_util2.isInteger(val) && val >= 0 && val <= 6;
+  return import_epdoc_util.isInteger(val) && val >= 0 && val <= 6;
 }
 function newFanSpeed6Service(entity_id, opts) {
   return new FanSpeed6Service(entity_id, opts);
@@ -901,19 +919,16 @@ class Entity {
     return defval;
   }
 }
-// src/fan.ts
-var import_epdoc_util3 = __toESM(require_dist(), 1);
-
 // src/ha.ts
-function newHA(globalHomeAssistant, opts) {
-  return new HA(globalHomeAssistant, opts);
+function newHA(opts) {
+  return new HA(opts);
 }
 
-class HA extends FunctionLog {
+class HA extends FunctionNodeBase {
   _ha;
-  constructor(globalHomeAssistant, opts) {
+  constructor(opts) {
     super(opts);
-    this._ha = globalHomeAssistant.homeAssistant;
+    this._ha = this.global.get("homeassistant");
   }
   get ha() {
     return this._ha;
@@ -947,301 +962,63 @@ class HA extends FunctionLog {
     }
   }
 }
-
-// src/fan.ts
-function setFan(gHA, fnSend, params, opts) {
-  const fan_id = "fan." + params.fan;
-  const switch_id = fan_id;
-  const DELAY = import_epdoc_util3.isNonEmptyArray(opts.delay) ? opts.delay : [1000, 3000];
-  const ha2 = new HA(gHA, opts);
-  ha2.warn(`setFan input params: ${JSON.stringify(params)}`);
-  const bShutoff = import_epdoc_util3.isNonEmptyString(params.shutOffEntityId) ? ha2.entity(params.shutOffEntityId).isOn() : false;
-  const swutch = ha2.entity(switch_id);
-  function fanState() {
-    return ha2.entity(switch_id).state();
-  }
-  let speed;
-  let service4;
-  let bOn = false;
-  let bOff = false;
-  if (isFanSpeed6Speed(params.speed)) {
-    speed = params.speed;
-  } else if (import_epdoc_util3.isNumber(params.percentage)) {
-    speed = FanSpeed6Service.percentageToSpeed(params.percentage);
-  }
-  if (import_epdoc_util3.isString(params.service) && REG.onoff.test(params.service)) {
-    service4 = params.service;
-    bOn = service4 === "on";
-    bOff = service4 === "off";
-  }
-  const timeout = parseInt(params.timeout, 10);
-  ha2.warn(`setFan bOn=${bOn} bOff=${bOff} speed=${speed} service=${service4} timeout=${timeout}`);
-  let bTurnedOn = false;
-  return Promise.resolve().then((resp) => {
-    ha2.warn(`${switch_id} is ${swutch.state()}`);
-    ha2.warn(`Shutoff (lightning) is ${bShutoff}`);
-    if (swutch.isOn() && (bShutoff || bOff || !bOn && speed === 0)) {
-      ha2.warn(`Turn off ${fan_id}`);
-      let payload = newFanSpeed6Service(params.fan, opts).off().payload();
-      fnSend(payload);
-    } else {
-      ha2.warn(`Fan ${fan_id} is ${swutch.state()}, no need to turn off`);
-    }
-    if (!swutch.isOn() && !bShutoff && (bOn || speed > 0)) {
-      ha2.warn(`Turn on ${switch_id} because fan was off`);
-      let payload = newSwitchService(switch_id, opts).on().payload();
-      fnSend(payload);
-      bTurnedOn = true;
-    } else {
-      ha2.warn(`Fan ${fan_id} is already on`);
-    }
-    if (!bShutoff && speed > 0 && bTurnedOn) {
-      ha2.warn("1st delay of " + DELAY[0] + " for " + switch_id);
-      return import_epdoc_util3.delayPromise(DELAY[0]);
-    } else {
-      return Promise.resolve();
-    }
-  }).then(function() {
-    if (!bShutoff && speed > 0) {
-      ha2.warn("1st set fan speed to " + speed + " for " + fan_id);
-      let payload = newFanSpeed6Service(params.fan, opts).speed(speed).payload();
-      fnSend(payload);
-      ha2.warn("2nd delay of " + DELAY[1] + " for " + switch_id);
-      return import_epdoc_util3.delayPromise(DELAY[1]);
-    } else {
-      ha2.warn(`Skipping set speed step and first delay for ${fan_id}`);
-      return Promise.resolve();
-    }
-  }).then(function() {
-    if (!bShutoff && speed > 0) {
-      ha2.warn("2nd set fan speed to " + speed + " for " + fan_id);
-      let payload = newFanSpeed6Service(params.fan, opts).speed(speed).payload();
-      fnSend(payload);
-    }
-    return Promise.resolve();
-  }).then(function() {
-    if ((bOn || speed > 0) && timeout && !bShutoff) {
-      ha2.warn(`timeout ${timeout} for ${switch_id}`);
-      return import_epdoc_util3.delayPromise(timeout);
-    } else {
-      return Promise.resolve();
-    }
-  }).then(function() {
-    if ((bOn || speed > 0) && timeout && !bShutoff) {
-      ha2.warn(`timeout turn off for ${switch_id}`);
-      let payload = newSwitchService(switch_id, opts).off().payload();
-      fnSend(payload);
-    }
-    return Promise.resolve();
-  });
+// src/types.ts
+var import_epdoc_util2 = __toESM(require_dist(), 1);
+function isNodeRedOpts(val) {
+  return import_epdoc_util2.isDict(val) && val.node && val.flow && val.env;
 }
-var REG = {
-  onoff: new RegExp(/^(on|off)$/, "i")
-};
-// src/history-filter.ts
-var import_epdoc_util5 = __toESM(require_dist(), 1);
-
-// src/location-history.ts
-var import_epdoc_util4 = __toESM(require_dist(), 1);
-function newLocationHistory(options) {
-  return new LocationHistory(options);
-}
-
-class LocationHistory extends FunctionLog {
-  GATE_HISTORY = "gate_history";
-  history = {};
-  dirty = false;
-  getStorage = null;
-  setStorage = null;
-  constructor(options) {
-    super(options);
-    this.getStorage = import_epdoc_util4.isFunction(options.getStorage) ? options.getStorage : null;
-    this.setStorage = import_epdoc_util4.isFunction(options.setStorage) ? options.setStorage : null;
-    this.read();
-  }
-  read() {
-    if (this.getStorage) {
-      this.history = this.getStorage(this.GATE_HISTORY) || {};
-    }
-    return this;
-  }
-  add(person, location, time) {
-    let oldItems = this.history[person];
-    if (!import_epdoc_util4.isArray(oldItems)) {
-      oldItems = [];
-    }
-    let newItems = [];
-    for (let idx = 0;idx < oldItems.length; ++idx) {
-      const item = oldItems[idx];
-      if (item.location !== location) {
-        newItems.push(item);
+function createNodeRedOptsMock(data) {
+  const opts = {
+    env: {
+      get: (key) => {
+        return data.env[key];
       }
+    },
+    flow: {
+      get: (key) => {
+        return data.flow[key];
+      },
+      set: (key, val) => {
+        data.flow[key] = val;
+      }
+    },
+    global: {
+      get: (key) => {
+        return data.global[key];
+      },
+      set: (key, val) => {
+        data.global[key] = val;
+      }
+    },
+    node: {
+      warn: (...args) => data.node.warn(...args),
+      debug: (...args) => data.node.warn(...args),
+      error: (...args) => data.node.warn(...args),
+      log: (...args) => data.node.warn(...args),
+      send: (...args) => data.node.warn(...args),
+      done: () => data.node.done()
     }
-    newItems.push({ location, time });
-    this.history[person] = newItems;
-    this.dirty = true;
-    return this;
-  }
-  filter(person) {
-    return new HistoryFilter(person, import_epdoc_util4.isArray(this.history[person]) ? this.history[person] : []);
-  }
-  person(person) {
-    return this.filter(person);
-  }
-  prune(tCutoff) {
-    Object.keys(this.history).forEach((key) => {
-      const items = this.history[key];
-      let newItems = [];
-      if (import_epdoc_util4.isArray(items)) {
-        for (let idx = 0;idx < items.length; ++idx) {
-          const item = items[idx];
-          if (tCutoff < item.time) {
-            newItems.push(item);
-          }
-        }
-      }
-      if (!import_epdoc_util4.isArray(items) || newItems.length !== items.length) {
-        this.history[key] = newItems;
-        this.dirty = true;
-      }
-    });
-    return this;
-  }
-  flush() {
-    if (this.dirty) {
-      if (this.setStorage) {
-        this.setStorage(this.GATE_HISTORY, this.history);
-      }
-      this.dirty = false;
-    }
-    return this;
-  }
-  toString(tNow) {
-    tNow = tNow ? tNow : new Date().getTime();
-    let result = {};
-    Object.keys(this.history).forEach((key) => {
-      const items = this.history[key];
-      result[key] = [];
-      if (import_epdoc_util4.isArray(items)) {
-        for (let idx = 0;idx < items.length; ++idx) {
-          result[key].push(LocationHistory._itemToString(items[idx], tNow));
-        }
-      }
-    });
-    return JSON.stringify(result);
-  }
-  static _itemToString(item, tNow) {
-    return {
-      location: item.location,
-      time: item.time - tNow
-    };
-  }
-}
-
-// src/history-filter.ts
-class HistoryFilter {
-  _person;
-  _items = [];
-  _locations = [];
-  _tCutoffMs;
-  constructor(person, items) {
-    this._person = person;
-    this._items = import_epdoc_util5.deepCopy(items);
-  }
-  cutoff(tCutoffMs) {
-    this._tCutoffMs = tCutoffMs;
-    if (import_epdoc_util5.isNonEmptyArray(this._items)) {
-      let newItems = [];
-      for (let idx = 0;idx < this._items.length; ++idx) {
-        const item = this._items[idx];
-        if (this._tCutoffMs < item.time) {
-          newItems.push(item);
-        }
-      }
-      this._items = newItems;
-    }
-    return this;
-  }
-  locations(locations) {
-    this._locations = import_epdoc_util5.isArray(locations) ? locations : [locations];
-    if (import_epdoc_util5.isNonEmptyArray(this._items) && import_epdoc_util5.isNonEmptyArray(this._locations)) {
-      let newItems = [];
-      for (let ldx = 0;ldx < this._locations.length; ++ldx) {
-        const location = this._locations[ldx];
-        for (let idx = 0;idx < this._items.length; ++idx) {
-          const item = this._items[idx];
-          if (location === item.location) {
-            newItems.push(item);
-          }
-        }
-      }
-      this._items = newItems;
-    }
-    return this;
-  }
-  sortByLocation() {
-    if (import_epdoc_util5.isNonEmptyArray(this._locations) && import_epdoc_util5.isNonEmptyArray(this._items) && this._items.length > 1) {
-      this._items.sort((a, b) => {
-        let adx = this._locations.indexOf(a.location);
-        let bdx = this._locations.indexOf(b.location);
-        return adx < bdx ? -1 : bdx < adx ? 1 : 0;
-      });
-    }
-    return this;
-  }
-  found() {
-    return import_epdoc_util5.isNonEmptyArray(this._items);
-  }
-  numFound() {
-    return this.found() ? this._items.length : 0;
-  }
-  orderedByTime() {
-    let result = false;
-    if (import_epdoc_util5.isNonEmptyArray(this._items) && this._items.length > 1) {
-      result = true;
-      for (let mdx = 0;mdx < this._items.length - 1; ++mdx) {
-        if (this._items[mdx].time > this._items[mdx + 1].time) {
-          return false;
-        }
-      }
-    }
-    return result;
-  }
-  moving() {
-    return this.sortByLocation().orderedByTime();
-  }
-  toString(tNow) {
-    tNow = tNow ? tNow : new Date().getTime();
-    let result = [];
-    if (import_epdoc_util5.isArray(this._items)) {
-      for (let idx = 0;idx < this._items.length; ++idx) {
-        result.push(LocationHistory._itemToString(this._items[idx], tNow));
-      }
-    }
-    return `(${this._person}) ` + JSON.stringify(result);
-  }
+  };
+  return opts;
 }
 export {
-  setFan,
   newSwitchService,
   newService,
-  newLocationHistory,
   newLightService,
   newHA,
   newFanSpeed6Service,
   newFanService,
   newCoverService,
   newAlarmService,
-  isLogFunction,
+  isNodeRedOpts,
   isFanSpeed6Speed,
   isAlarmServiceArmType,
+  createNodeRedOptsMock,
   SwitchService,
   Service,
-  LocationHistory,
   LightService,
-  HistoryFilter,
   HA,
-  FunctionLog,
+  FunctionNodeBase,
   FanSpeed6Service,
   FanService,
   EntityState,

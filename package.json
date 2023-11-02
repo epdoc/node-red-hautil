@@ -1,7 +1,7 @@
 {
-  "name": "epdoc-node-red-utils",
+  "name": "epdoc-node-red-hautil",
   "version": "0.15.3",
-  "description": "Node-RED utils for Home Assistant",
+  "description": "General Purpose Node-RED utils for Home Assistant",
   "private": false,
   "modules": "src/index.ts",
   "type": "module",
@@ -10,7 +10,7 @@
     "nodered",
     "homeassistant"
   ],
-  "license": "GNU GENERAL PUBLIC LICENSE",
+  "license": "MIT",
   "author": {
     "name": "James Pravetz",
     "email": "jpravetz@epdoc.com"
@@ -18,13 +18,15 @@
   "main": "dist/index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jpravetz/hassio-node-red-utils.git"
+    "url": "git+https://github.com/jpravetz/epdoc-node-red-util.git"
   },
   "scripts": {
-    "build": "bun build ./src/index.ts --outdir ./dist",
-    "clean": "rm -rf dist && echo 'Done.'",
+    "build": "bun build ./src/index.ts --target node --outdir ./dist && bun run build:declaration",
+    "build:declaration": "tsc --emitDeclarationOnly",
+    "clean": "rm -rf dist docs && echo 'Done.'",
     "coverage": "bun test --coverage",
-    "format": "prettier --write 'src/**/*.ts'"
+    "format": "prettier --write 'src/**/*.ts'",
+    "docs": "./node_modules/typedoc/bin/typedoc"
   },
   "devDependencies": {
     "eslint": "^8.49.0",
@@ -34,7 +36,8 @@
     "bun-types": "latest"
   },
   "dependencies": {
-    "epdoc-util": "^0.2.6"
+    "epdoc-util": "^0.2.6",
+    "typedoc": "^0.25.3"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"

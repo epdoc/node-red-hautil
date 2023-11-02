@@ -17,13 +17,13 @@ For classes it is perhaps easiest to add a constructor method outside of the
 scope of the class:
 
 ```javascript
-export function newHA(globalHomeAssistant, options) {
-  return new HA(globalHomeAssistant, options);
+export function newHA(options) {
+  return new HA(options);
 }
 
 export class HA {
-  constructor(globalHomeAssistant, options) {
-    this._ha = globalHomeAssistant.homeAssistant;
+  constructor(options) {
+    this._ha = options.global.get('homeassistant');
   }
 
   get ha() {

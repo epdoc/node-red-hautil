@@ -1,8 +1,7 @@
-import { LogOpts } from './function-log';
 import { Service } from './service';
-import { EntityDomain, EntityId } from './types';
+import { EntityDomain, EntityId, NodeRedOpts } from './types';
 
-export function newCoverService(entity_id: EntityId, opts: LogOpts) {
+export function newCoverService(entity_id: EntityId, opts?: NodeRedOpts) {
   return new CoverService(entity_id, opts);
 }
 
@@ -19,7 +18,7 @@ export class CoverService extends Service {
    * Shortcut to set service to close_cover.
    * @returns
    */
-  close(): CoverService {
+  close(): this {
     this._payload.service = 'close_cover';
     return this;
   }
@@ -28,12 +27,12 @@ export class CoverService extends Service {
    * Shortcut to set service to open_cover.
    * @returns
    */
-  open(): CoverService {
+  open(): this {
     this._payload.service = 'open_cover';
     return this;
   }
 
-  stop(): CoverService {
+  stop(): this {
     this._payload.service = 'stop_cover';
     return this;
   }

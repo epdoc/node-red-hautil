@@ -1,6 +1,6 @@
 import { Dict, Integer } from 'epdoc-util';
-import { FunctionLog, LogOpts } from './function-log';
-import { EntityDomain, EntityId, EntityService } from './types';
+import { FunctionNodeBase } from './function-node-base';
+import { EntityDomain, EntityId, EntityService, NodeRedOpts } from './types';
 
 export type ServicePayloadTarget = {
   entity_id: EntityId;
@@ -21,14 +21,14 @@ export type ServicePayload = {
   data?: ServiceDataDict;
 };
 
-export function newService(entity_id: EntityId, opts: LogOpts) {
+export function newService(entity_id: EntityId, opts?: NodeRedOpts): Service {
   return new Service(entity_id, opts);
 }
 
 /**
  * Payload builder for Call Service node.
  */
-export class Service extends FunctionLog {
+export class Service extends FunctionNodeBase {
   protected _payload: ServicePayload = { target: { entity_id: '' } };
 
   /**
@@ -46,12 +46,12 @@ export class Service extends FunctionLog {
    * @param {string} domain Required if domain is not part of entity_id  (e.g.
    * entity_id is 'bedroom' rather than 'fan.bedroom').
    */
-  constructor(entity_id: EntityId, opts: LogOpts) {
+  constructor(entity_id: EntityId, opts?: NodeRedOpts) {
     super(opts);
     this.initPayload(entity_id);
   }
 
-  private initPayload(entity_id: EntityId): Service {
+  private initPayload(entity_id: EntityId): this {
     const domain: EntityDomain | undefined = this._domain();
     this._payload.target = { entity_id: entity_id };
     this._payload.domain = domain;
@@ -78,7 +78,7 @@ export class Service extends FunctionLog {
    * @param {string} val The domain string (e.g. 'fan' or 'light')
    * @returns this
    */
-  domain(val: EntityDomain): Service {
+  domain(val: EntityDomain): this {
     this._payload.domain = val;
     if (!this._payload.target.entity_id.includes('.')) {
       this._payload.target.entity_id = val + '.' + this._payload.target.entity_id;
@@ -91,7 +91,7 @@ export class Service extends FunctionLog {
    * @param {string} val The string to use in a service field.
    * @returns
    */
-  service(val: EntityService): Service {
+  service(val: EntityService): this {
     this._payload.service = val;
     return this;
   }
@@ -109,7 +109,7 @@ export class Service extends FunctionLog {
    * Increment a value. Applies only to service calls that support 'increment'.
    * @returns this
    */
-  increment(): Service {
+  increment(): this {
     this._payload.service = 'increment';
     return this;
   }
@@ -118,7 +118,7 @@ export class Service extends FunctionLog {
    * Decrement a value. Applies only to service calls that support `decrement`.
    * @returns this
    */
-  decrement(): Service {
+  decrement(): this {
     this._payload.service = 'decrement';
     return this;
   }
@@ -129,7 +129,7 @@ export class Service extends FunctionLog {
    * @param {*} val
    * @returns
    */
-  value(val: any): Service {
+  value(val: any): this {
     this._payload.service = 'set_value';
     this._payload.data = {
       value: val,
@@ -144,7 +144,7 @@ export class Service extends FunctionLog {
    * @param {Date} val A Date object
    * @returns
    */
-  date(val: Date): Service {
+  date(val: Date): this {
     this._payload.service = 'set_datetime';
     this._payload.data = {
       timestamp: Math.round(val.getTime() / 1000),

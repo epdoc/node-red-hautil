@@ -1,6 +1,5 @@
-import { LogOpts } from './function-log';
 import { Service } from './service';
-import { EntityDomain, EntityId } from './types';
+import { EntityDomain, EntityId, NodeRedOpts } from './types';
 
 const ARMTYPE = {
   away: 'alarm_arm_away',
@@ -15,8 +14,8 @@ export function isAlarmServiceArmType(val: any): val is AlarmServiceArmType {
   return ARMTYPE.hasOwnProperty(val);
 }
 
-export function newAlarmService(entity_id: EntityId, opts: LogOpts) {
-  return new Service(entity_id, opts);
+export function newAlarmService(entity_id: EntityId, opts?: NodeRedOpts): AlarmService {
+  return new AlarmService(entity_id, opts);
 }
 
 /**
@@ -32,12 +31,12 @@ export class AlarmService extends Service {
    * Shortcut to set service to alarm_disarm.
    * @returns
    */
-  disarm(): AlarmService {
+  disarm(): this {
     this._payload.service = 'alarm_disarm';
     return this;
   }
 
-  arm(type: AlarmServiceArmType): AlarmService {
+  arm(type: AlarmServiceArmType): this {
     if (isAlarmServiceArmType(type)) {
       this._payload.service = ARMTYPE[type];
     }

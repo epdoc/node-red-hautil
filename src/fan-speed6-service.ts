@@ -1,14 +1,13 @@
 import { Integer, isInteger } from 'epdoc-util';
 import { FanService } from './fan-service';
-import { LogOpts } from './function-log';
-import { EntityId } from './types';
+import { EntityId, NodeRedOpts } from './types';
 
 export type FanSpeed6Speed = Integer;
 export function isFanSpeed6Speed(val: any): val is FanSpeed6Speed {
   return isInteger(val) && val >= 0 && val <= 6;
 }
 
-export function newFanSpeed6Service(entity_id: EntityId, opts: LogOpts) {
+export function newFanSpeed6Service(entity_id: EntityId, opts?: NodeRedOpts): FanSpeed6Service {
   return new FanSpeed6Service(entity_id, opts);
 }
 const FAN_PERCENTAGES = [0, 16, 33, 50, 66, 83, 100];
