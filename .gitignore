@@ -31,6 +31,10 @@ coverage
 # Grunt intermediate storage (http://gruntjs.com/creating-plugins#storing-task-files)
 .grunt
 
+# TypeScript cache
+
+\*.tsbuildinfo
+
 # node-waf configuration
 .lock-wscript
 
