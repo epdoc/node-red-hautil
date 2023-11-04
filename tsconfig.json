@@ -1,5 +1,13 @@
 {
   "compilerOptions": {
+    "target": "ES2015",
+    "module": "commonjs",
+    "declaration": true,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "esModuleInterop": true
+  },
+  "a_compilerOptions": {
     "target": "es6",
     "module": "commonjs",
     "declaration": true,
@@ -8,35 +16,6 @@
     "resolveJsonModule": true,
     "esModuleInterop": true
   },
-  "y_compilerOptions": {
-    "lib": ["ESNext"],
-    "module": "esnext",
-    "target": "esnext",
-    "outDir": "./dist",
-    "declaration": true,
-    "sourceMap": true,
-    "moduleResolution": "bundler",
-    "moduleDetection": "force",
-    "composite": true,
-    "strict": true,
-    "downlevelIteration": true,
-    "skipLibCheck": true,
-    "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "types": [
-      "bun-types" // add Bun global
-    ]
-  },
-  "typedocOptions": {
-    "entryPoints": ["src/index.ts"],
-    "out": "docs"
-  },
   "include": ["src/**/*.ts"],
-  "exclude": ["node_modules"],
-  "x_compilerOptions": {
-    "x_outFile": "./dist/index.ts",
-    "x_emitDeclarationOnly": true
-  }
+  "exclude": ["node_modules"]
 }

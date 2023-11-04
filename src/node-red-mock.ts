@@ -1,5 +1,5 @@
 import { Dict } from 'epdoc-util';
-import { ContextKey, EnvKey, NodeRedOpts } from './types';
+import { ContextKey, EntityId, EnvKey, NodeRedOpts } from './types';
 
 export type NodeRedOptsMockData = {
   env: Dict;
@@ -18,10 +18,10 @@ export class NodeRedOptsMock {
     flow: {},
     global: {
       homeassistant: {
-        states: {},
-      },
+        states: {}
+      }
     },
-    node: {},
+    node: {}
   };
 
   constructor() {
@@ -33,7 +33,7 @@ export class NodeRedOptsMock {
       env: {
         get: (key: EnvKey) => {
           return this.db.env[key];
-        },
+        }
       },
       flow: {
         get: (key: ContextKey) => {
@@ -41,7 +41,7 @@ export class NodeRedOptsMock {
         },
         set: (key: ContextKey, val: any) => {
           this.db.flow[key] = val;
-        },
+        }
       },
       global: {
         get: (key: ContextKey) => {
@@ -49,16 +49,16 @@ export class NodeRedOptsMock {
         },
         set: (key: ContextKey, val: any) => {
           this.db.global[key] = val;
-        },
+        }
       },
       node: {
-        warn: (...args: any) => this.db.node.warn(...args),
-        debug: (...args: any) => this.db.node.warn(...args),
-        error: (...args: any) => this.db.node.warn(...args),
-        log: (...args: any) => this.db.node.warn(...args),
-        send: (...args: any) => this.db.node.warn(...args),
-        done: () => this.db.node.done(),
-      },
+        warn: (...args: any) => {},
+        debug: (...args: any) => {},
+        error: (...args: any) => {},
+        log: (...args: any) => {},
+        send: (...args: any) => {},
+        done: () => {}
+      }
     };
   }
 
@@ -67,16 +67,35 @@ export class NodeRedOptsMock {
     return this;
   }
 
+  getEntity(entityId: EntityId): Dict {
+    return this.db.global.homeassistant.states[entityId];
+  }
+
+  setEntity(entityId: EntityId, val: any): this {
+    this.db.global.homeassistant.states[entityId] = val;
+    return this;
+  }
+
+  setState(entityId: EntityId, state: any): this {
+    this.db.global.homeassistant.states[entityId] = { state: state };
+    return this;
+  }
+
+  getState(entityId: EntityId): any {
+    const entity = this.getEntity(entityId);
+    return entity ? entity.state : undefined;
+  }
+
   setEnv(key: EnvKey, value: any): this {
-    this.db.env[key] = value;
+    this.opts.env[key] = value;
     return this;
   }
   setFlow(key: ContextKey, value: any): this {
-    this.db.flow[key] = value;
+    this.opts.flow[key] = value;
     return this;
   }
   setGlobal(key: ContextKey, value: any): this {
-    this.db.global[key] = value;
+    this.opts.global[key] = value;
     return this;
   }
 }
