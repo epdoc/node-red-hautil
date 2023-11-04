@@ -1,1 +1,0 @@
-{"version":3,"file":"fan-service.js","sourceRoot":"","sources":["../src/fan-service.ts"],"names":[],"mappings":";;;AAAA,mDAA+C;AAG/C,SAAgB,aAAa,CAAC,SAAmB,EAAE,IAAkB;IACnE,OAAO,IAAI,UAAU,CAAC,SAAS,EAAE,IAAI,CAAC,CAAC;AACzC,CAAC;AAFD,sCAEC;AAED;;GAEG;AACH,MAAa,UAAW,SAAQ,4BAAY;IAC1C,mBAAmB;IAEnB,OAAO;QACL,OAAO,KAAK,CAAC;IACf,CAAC;CACF;AAND,gCAMC"}

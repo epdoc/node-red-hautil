@@ -25,10 +25,6 @@ export class NodeRedOptsMock {
   };
 
   constructor() {
-    this.init();
-  }
-
-  init() {
     this.opts = {
       env: {
         get: (key: EnvKey) => {
@@ -87,15 +83,18 @@ export class NodeRedOptsMock {
   }
 
   setEnv(key: EnvKey, value: any): this {
+    // @ts-ignore
     this.opts.env[key] = value;
     return this;
   }
   setFlow(key: ContextKey, value: any): this {
-    this.opts.flow[key] = value;
+     // @ts-ignore
+     this.opts.flow[key] = value;
     return this;
   }
   setGlobal(key: ContextKey, value: any): this {
-    this.opts.global[key] = value;
+     // @ts-ignore
+     this.opts.global[key] = value;
     return this;
   }
 }
