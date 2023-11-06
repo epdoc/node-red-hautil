@@ -30,10 +30,15 @@ export type NodeRedGlobalObject = {
   get: NodeRedContextGetFunction;
   set: NodeRedContextSetFunction;
 };
+/**
+ * For sidebar debug messages, only the `error` and `warn` methods will result
+ * in output, regardless of the logging level set in `settings.js`.
+ */
 export type NodeRedNodeObject = {
-  warn: NodeRedLogFunction;
   error: NodeRedLogFunction;
+  warn: NodeRedLogFunction;
   debug: NodeRedLogFunction;
+  trace: NodeRedLogFunction;
   log: NodeRedLogFunction;
   send: NodeRedSendFunction;
   done: () => void;

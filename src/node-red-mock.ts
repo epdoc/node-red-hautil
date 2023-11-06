@@ -48,9 +48,10 @@ export class NodeRedOptsMock {
         }
       },
       node: {
+        error: (...args: any) => {},
         warn: (...args: any) => {},
         debug: (...args: any) => {},
-        error: (...args: any) => {},
+        trace: (...args: any) => {},
         log: (...args: any) => {},
         send: (...args: any) => {},
         done: () => {}
@@ -88,13 +89,13 @@ export class NodeRedOptsMock {
     return this;
   }
   setFlow(key: ContextKey, value: any): this {
-     // @ts-ignore
-     this.opts.flow[key] = value;
+    // @ts-ignore
+    this.opts.flow[key] = value;
     return this;
   }
   setGlobal(key: ContextKey, value: any): this {
-     // @ts-ignore
-     this.opts.global[key] = value;
+    // @ts-ignore
+    this.opts.global[key] = value;
     return this;
   }
 }
