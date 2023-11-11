@@ -1,5 +1,5 @@
 import { SwitchService } from './switch-service';
-import { EntityDomain, EntityId, NodeRedOpts } from './types';
+import { EntityDomain, EntityId } from './types';
 
 export function newLightService(entity_id: EntityId): LightService {
   return new LightService(entity_id);
