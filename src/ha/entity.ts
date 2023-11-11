@@ -1,8 +1,8 @@
 import { Dict, Integer, isDefined } from 'epdoc-util';
+import { FanSpeed6Service } from '../services/fan-speed6-service';
+import { EntityId } from '../types';
 import { EntityAttributes, HAEntityAttributesData } from './entity-attributes';
 import { EntityState, HAEntityStateData } from './entity-state';
-import { FanSpeed6Service } from './fan-speed6-service';
-import { EntityId } from './types';
 
 export type HAEntityData = Dict & {
   entity_id: EntityId;

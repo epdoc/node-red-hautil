@@ -1,6 +1,6 @@
 import { isDict, isObject } from 'epdoc-util';
-import { HA, HaSensorDict, newFanSpeed6Service, newService } from '../src';
-import { NodeRedGlobalMock } from '../src/node-red-global-mock';
+import { HaSensorDict, newFanSpeed6Service, newHAFactory, newService } from '../src';
+import { NodeRedGlobalMock } from '../src/mocks/node-red-global-mock';
 
 describe('ha', () => {
   const mock: NodeRedGlobalMock = new NodeRedGlobalMock();
@@ -20,7 +20,8 @@ describe('ha', () => {
         state: 'off'
       }
     });
-    let ha = new HA(mock);
+    let factory = newHAFactory(mock);
+    let ha = factory.newHA();
 
     it('isEntityOn', () => {
       expect(ha.entity('entity2').isOn()).toEqual(true);

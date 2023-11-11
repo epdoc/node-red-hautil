@@ -1,5 +1,5 @@
+import { EntityDomain, EntityId } from '../types';
 import { LightService } from './light-service';
-import { EntityDomain, EntityId } from './types';
 
 export function newFanService(entity_id: EntityId): FanService {
   return new FanService(entity_id);

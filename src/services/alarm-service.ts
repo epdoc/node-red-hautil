@@ -1,5 +1,5 @@
+import { EntityDomain, EntityId } from '../types';
 import { Service } from './service';
-import { EntityDomain, EntityId } from './types';
 
 const ARMTYPE = {
   away: 'alarm_arm_away',

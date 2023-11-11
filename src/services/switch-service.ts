@@ -1,5 +1,5 @@
+import { EntityDomain, EntityId } from '../types';
 import { Service } from './service';
-import { EntityDomain, EntityId } from './types';
 
 export function newSwitchService(entity_id: EntityId): SwitchService {
   return new SwitchService(entity_id);

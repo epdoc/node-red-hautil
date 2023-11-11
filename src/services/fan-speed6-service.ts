@@ -1,6 +1,6 @@
 import { Integer, isInteger } from 'epdoc-util';
+import { EntityId } from '../types';
 import { FanService } from './fan-service';
-import { EntityId } from './types';
 
 export type FanSpeed6Speed = Integer;
 export function isFanSpeed6Speed(val: any): val is FanSpeed6Speed {

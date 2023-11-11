@@ -1,6 +1,6 @@
+import { EntityId, NodeRedGlobalApi } from '../types';
 import { Entity } from './entity';
 import { EntityState } from './entity-state';
-import { EntityId, NodeRedGlobalObject } from './types';
 
 export type HomeAssistant = any;
 export type HaSensorDictEntry = {
@@ -26,7 +26,7 @@ export class HA {
    * @param {Object} globalHomeAssistant The value of global.get('homeassistant')
    * @param {Function} options.log Function that takes a string as a parameter and that outputs log messages.
    */
-  constructor(global: NodeRedGlobalObject) {
+  constructor(global: NodeRedGlobalApi) {
     const gHA = global.get('homeassistant');
     if (gHA) {
       this._ha = gHA.homeAssistant;
