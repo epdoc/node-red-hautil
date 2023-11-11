@@ -1,7 +1,6 @@
 import { Entity } from './entity';
 import { EntityState } from './entity-state';
-import { FunctionNodeBase } from './function-node-base';
-import { EntityId, NodeRedOpts } from './types';
+import { EntityId, NodeRedGlobalObject } from './types';
 
 export type HomeAssistant = any;
 export type HaSensorDictEntry = {
@@ -16,14 +15,10 @@ export type HaSensorDictEntry = {
 };
 export type HaSensorDict = Record<string, HaSensorDictEntry>;
 
-export function newHA(opts: NodeRedOpts) {
-  return new HA(opts);
-}
-
 /**
  * Class wraps a home assistant object, for use in Node-RED functions.
  */
-export class HA extends FunctionNodeBase {
+export class HA {
   protected _ha: HomeAssistant;
 
   /**
@@ -31,10 +26,28 @@ export class HA extends FunctionNodeBase {
    * @param {Object} globalHomeAssistant The value of global.get('homeassistant')
    * @param {Function} options.log Function that takes a string as a parameter and that outputs log messages.
    */
-  constructor(opts: NodeRedOpts) {
-    super(opts);
-    this._ha = this.global.get('homeassistant');
+  constructor(global: NodeRedGlobalObject) {
+    const gHA = global.get('homeassistant');
+    if (gHA) {
+      this._ha = gHA.homeAssistant;
+    }
+    if (!gHA) {
+      throw new Error('Home Assistant global not found');
+    }
+    if (!gHA || !this._ha) {
+      throw new Error('Home Assistant context not found');
+    }
+    if (!gHA || !this._ha || !this._ha.states) {
+      throw new Error('Home Assistant entity states not found');
+    }
   }
+
+  // xx() {
+  //   const gHA = global.get('homeassistant');
+  //   const ha = gHA.homeAssistant;
+  //   const entity = ha.states[entity_id];
+  // 	return entity && entity.state === "on" ? true : false;
+  // }
 
   get ha(): HomeAssistant {
     return this._ha;
@@ -46,7 +59,11 @@ export class HA extends FunctionNodeBase {
    * @returns The entity object for the specified `entity_id`.
    */
   entity(entity_id: EntityId): Entity {
-    return new Entity(this._ha.states[entity_id]);
+    if (this._ha.states.hasOwnProperty(entity_id)) {
+      const item: any = this._ha.states[entity_id];
+      return new Entity(item);
+    }
+    return new Entity();
   }
 
   /**
@@ -55,7 +72,7 @@ export class HA extends FunctionNodeBase {
    * @returns
    */
   entityState(entity_id: EntityId): EntityState | undefined {
-    const entity: Entity = this.entity(entity_id);
+    const entity: Entity | undefined = this.entity(entity_id);
     return entity ? entity.state() : undefined;
   }
 

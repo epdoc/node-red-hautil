@@ -1,5 +1,5 @@
 import { Service } from './service';
-import { EntityDomain, EntityId, NodeRedOpts } from './types';
+import { EntityDomain, EntityId } from './types';
 
 const ARMTYPE = {
   away: 'alarm_arm_away',
@@ -7,15 +7,15 @@ const ARMTYPE = {
   night: 'alarm_arm_night',
   vacation: 'alarm_arm_vacation',
   custom_bypass: 'arm_arm_custom_bypass',
-  trigger: 'alarm_trigger',
+  trigger: 'alarm_trigger'
 };
 export type AlarmServiceArmType = 'home' | 'away' | 'night' | 'vacation' | 'custom_bypass' | 'trigger';
 export function isAlarmServiceArmType(val: any): val is AlarmServiceArmType {
   return ARMTYPE.hasOwnProperty(val);
 }
 
-export function newAlarmService(entity_id: EntityId, opts?: NodeRedOpts): AlarmService {
-  return new AlarmService(entity_id, opts);
+export function newAlarmService(entity_id: EntityId): AlarmService {
+  return new AlarmService(entity_id);
 }
 
 /**

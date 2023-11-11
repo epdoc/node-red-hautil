@@ -1,8 +1,8 @@
 import { LightService } from './light-service';
-import { EntityDomain, EntityId, NodeRedOpts } from './types';
+import { EntityDomain, EntityId } from './types';
 
-export function newFanService(entity_id: EntityId, opts?: NodeRedOpts): FanService {
-  return new FanService(entity_id, opts);
+export function newFanService(entity_id: EntityId): FanService {
+  return new FanService(entity_id);
 }
 
 /**

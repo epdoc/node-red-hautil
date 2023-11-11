@@ -1,8 +1,8 @@
 import { SwitchService } from './switch-service';
 import { EntityDomain, EntityId, NodeRedOpts } from './types';
 
-export function newLightService(entity_id: EntityId, opts?: NodeRedOpts): LightService {
-  return new LightService(entity_id, opts);
+export function newLightService(entity_id: EntityId): LightService {
+  return new LightService(entity_id);
 }
 
 /**
@@ -17,7 +17,7 @@ export class LightService extends SwitchService {
   percentage(val: number): this {
     this._payload.service = 'set_percentage';
     this._payload.data = {
-      percentage: val,
+      percentage: val
     };
     return this;
   }

@@ -1,15 +1,20 @@
-import { Integer } from 'epdoc-util';
+import { Dict, Integer, isDefined, isInteger, isNumber, isString } from 'epdoc-util';
 
-export type HomeAssistantEntityState = any;
+export type HAEntityStateData = 'on' | 'off' | number | string | Dict;
 
 export class EntityState {
-  private _state: HomeAssistantEntityState;
+  private _state: HAEntityStateData | undefined;
 
-  constructor(state: HomeAssistantEntityState) {
+  constructor(state: HAEntityStateData | undefined) {
     this._state = state;
   }
+
+  isValid(): boolean {
+    return isDefined(this._state);
+  }
+
   equals(val: any): boolean {
-    return this._state === val;
+    return this._state ? this._state === val : false;
   }
 
   isOn(): boolean {
@@ -19,16 +24,28 @@ export class EntityState {
     return this.equals('off');
   }
   asNumber(defval?: number): number | undefined {
-    return this._state ? parseFloat(this._state) : defval;
-  }
-  asInt(defval?: Integer): Integer | undefined {
-    return this._state ? parseInt(this._state, 10) : defval;
+    if (isString(this._state)) {
+      return parseFloat(this._state);
+    } else if (isNumber(this._state)) {
+      return this._state;
+    }
+    return defval;
   }
   asInteger(defval?: Integer): Integer | undefined {
-    return this.asInt(defval);
+    if (isString(this._state)) {
+      return parseInt(this._state, 10);
+    } else if (isInteger(this._state)) {
+      return this._state;
+    } else if (isNumber(this._state)) {
+      return Math.round(this._state);
+    }
+    return defval;
+  }
+  asInt(defval?: Integer): Integer | undefined {
+    return this.asInteger(defval);
   }
   toString(): string {
-    return this._state;
+    return String(this._state);
   }
 
   value(): any {

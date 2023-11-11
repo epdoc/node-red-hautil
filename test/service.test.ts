@@ -4,13 +4,12 @@ import {
   CoverService,
   FanSpeed6Service,
   LightService,
-  NodeRedOptsMock,
   Service,
   SwitchService,
   newAlarmService,
   newCoverService,
   newFanSpeed6Service,
-  newSwitchService,
+  newSwitchService
 } from '../src';
 
 describe('service', () => {
@@ -36,10 +35,8 @@ describe('service', () => {
       });
     });
     describe('fan', () => {
-      const mock = new NodeRedOptsMock();
-
       it('speed', () => {
-        const fan = new FanSpeed6Service('other_room', mock.opts);
+        const fan = new FanSpeed6Service('other_room');
         const payload = fan.speed(4).payload();
         expect(isObject(payload)).toEqual(true);
         expect(payload).toEqual({
@@ -47,21 +44,21 @@ describe('service', () => {
           domain: 'fan',
           service: 'set_percentage',
           data: {
-            percentage: 66,
-          },
+            percentage: 66
+          }
         });
       });
       it('on', () => {
-        const payload = newFanSpeed6Service('more_rooms', mock.opts).on().payload();
+        const payload = newFanSpeed6Service('more_rooms').on().payload();
         expect(isObject(payload)).toEqual(true);
         expect(payload).toEqual({
           target: { entity_id: 'fan.more_rooms' },
           domain: 'fan',
-          service: 'turn_on',
+          service: 'turn_on'
         });
       });
       it('percentage', () => {
-        const fan = newFanSpeed6Service('less_rooms', mock.opts);
+        const fan = newFanSpeed6Service('less_rooms');
         const payload = fan.percentage(50).payload();
         expect(isObject(payload)).toEqual(true);
         expect(payload).toEqual({
@@ -69,63 +66,63 @@ describe('service', () => {
           domain: 'fan',
           service: 'set_percentage',
           data: {
-            percentage: 50,
-          },
+            percentage: 50
+          }
         });
       });
       describe('light', () => {
         it('on', () => {
-          const light = new LightService('master_bedroom', mock.opts);
+          const light = new LightService('master_bedroom');
           let payload = light.on().payload();
           expect(isObject(payload)).toEqual(true);
           expect(payload).toEqual({
             target: { entity_id: 'light.master_bedroom' },
             domain: 'light',
-            service: 'turn_on',
+            service: 'turn_on'
           });
         });
         it('off', () => {
-          const light = new LightService('light.master_bedroom', mock.opts);
+          const light = new LightService('light.master_bedroom');
           let payload = light.domain('light').off().payload();
           expect(isObject(payload)).toEqual(true);
           expect(payload).toEqual({
             target: { entity_id: 'light.master_bedroom' },
             domain: 'light',
-            service: 'turn_off',
+            service: 'turn_off'
           });
         });
       });
       describe('switch', () => {
         it('on', () => {
-          const payloadBuilder = new SwitchService('master_bedroom', mock.opts);
+          const payloadBuilder = new SwitchService('master_bedroom');
           let payload = payloadBuilder.on().payload();
           expect(isObject(payload)).toEqual(true);
           expect(payload).toEqual({
             target: { entity_id: 'switch.master_bedroom' },
             domain: 'switch',
-            service: 'turn_on',
+            service: 'turn_on'
           });
         });
         it('off', () => {
-          const payload = newSwitchService('switch.master_bedroom', mock.opts).off().payload();
+          const payload = newSwitchService('switch.master_bedroom').off().payload();
           expect(isObject(payload)).toEqual(true);
           expect(payload).toEqual({
             target: { entity_id: 'switch.master_bedroom' },
             domain: 'switch',
-            service: 'turn_off',
+            service: 'turn_off'
           });
         });
       });
       describe('input_number', () => {
         it('value', () => {
-          const payloadBuilder = new Service('input_number.master_bedroom', mock.opts);
+          const payloadBuilder = new Service('input_number.master_bedroom');
           let payload = payloadBuilder.value(32.3).payload();
           expect(isObject(payload)).toEqual(true);
           expect(payload).toEqual({
             target: { entity_id: 'input_number.master_bedroom' },
             domain: 'input_number',
             service: 'set_value',
-            data: { value: 32.3 },
+            data: { value: 32.3 }
           });
         });
         it('increment', () => {
@@ -135,7 +132,7 @@ describe('service', () => {
           expect(result).toEqual({
             target: { entity_id: 'input_number.master_bedroom' },
             domain: 'input_number',
-            service: 'increment',
+            service: 'increment'
           });
         });
       });
@@ -147,7 +144,7 @@ describe('service', () => {
           expect(payload).toEqual({
             target: { entity_id: 'input_boolean.test_alive' },
             domain: 'input_boolean',
-            service: 'turn_on',
+            service: 'turn_on'
           });
         });
         it('increment', () => {
@@ -157,7 +154,7 @@ describe('service', () => {
           expect(result).toEqual({
             target: { entity_id: 'input_number.master_bedroom' },
             domain: 'input_number',
-            service: 'increment',
+            service: 'increment'
           });
         });
       });
@@ -168,7 +165,7 @@ describe('service', () => {
           expect(payload).toEqual({
             target: { entity_id: 'cover.garage' },
             domain: 'cover',
-            service: 'close_cover',
+            service: 'close_cover'
           });
         });
         it('open', () => {
@@ -177,7 +174,7 @@ describe('service', () => {
           expect(payload).toEqual({
             target: { entity_id: 'cover.master_bedroom' },
             domain: 'cover',
-            service: 'open_cover',
+            service: 'open_cover'
           });
         });
         it('stop', () => {
@@ -187,7 +184,7 @@ describe('service', () => {
           expect(payload).toEqual({
             target: { entity_id: 'cover.master_bedroom' },
             domain: 'cover',
-            service: 'stop_cover',
+            service: 'stop_cover'
           });
         });
         it('stop2', () => {
@@ -197,7 +194,7 @@ describe('service', () => {
           expect(payload).toEqual({
             target: { entity_id: 'cover.master_bedroom' },
             domain: 'cover',
-            service: 'stop_cover',
+            service: 'stop_cover'
           });
         });
       });
@@ -208,7 +205,7 @@ describe('service', () => {
           expect(payload).toEqual({
             target: { entity_id: 'alarm_control_panel.workshop' },
             domain: 'alarm_control_panel',
-            service: 'alarm_disarm',
+            service: 'alarm_disarm'
           });
         });
         it('arm_away', () => {
@@ -218,7 +215,7 @@ describe('service', () => {
           expect(payload).toEqual({
             target: { entity_id: 'alarm_control_panel.workshop' },
             domain: 'alarm_control_panel',
-            service: 'alarm_arm_away',
+            service: 'alarm_arm_away'
           });
         });
         it('arm_away2', () => {
@@ -227,7 +224,7 @@ describe('service', () => {
           expect(payload).toEqual({
             target: { entity_id: 'alarm_control_panel.workshop' },
             domain: 'alarm_control_panel',
-            service: 'alarm_arm_away',
+            service: 'alarm_arm_away'
           });
         });
         it('arm_night', () => {
@@ -236,7 +233,7 @@ describe('service', () => {
           expect(payload).toEqual({
             target: { entity_id: 'alarm_control_panel.workshop' },
             domain: 'alarm_control_panel',
-            service: 'alarm_arm_night',
+            service: 'alarm_arm_night'
           });
         });
         it('arm_trigger', () => {
@@ -245,7 +242,7 @@ describe('service', () => {
           expect(payload).toEqual({
             target: { entity_id: 'alarm_control_panel.workshop' },
             domain: 'alarm_control_panel',
-            service: 'alarm_trigger',
+            service: 'alarm_trigger'
           });
         });
       });

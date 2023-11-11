@@ -1,4 +1,5 @@
 import { Dict } from 'epdoc-util';
+import { NodeRedGlobalMock } from './node-red-global-mock';
 import { ContextKey, EntityId, EnvKey, NodeRedOpts } from './types';
 
 export type NodeRedOptsMockData = {
@@ -16,15 +17,19 @@ export class NodeRedOptsMock {
   db: Dict = {
     env: {},
     flow: {},
-    global: {
+    global: NodeRedGlobalMock,
+    global2: {
       homeassistant: {
-        states: {}
+        homeAssistant: {
+          states: {}
+        }
       }
     },
     node: {}
   };
 
   constructor() {
+    const g: NodeRedGlobalMock = new NodeRedGlobalMock();
     this.opts = {
       env: {
         get: (key: EnvKey) => {
@@ -39,14 +44,15 @@ export class NodeRedOptsMock {
           this.db.flow[key] = val;
         }
       },
-      global: {
-        get: (key: ContextKey) => {
-          return this.db.global[key];
-        },
-        set: (key: ContextKey, val: any) => {
-          this.db.global[key] = val;
-        }
-      },
+      global: g,
+      // global2: {
+      //   get: (key: ContextKey) => {
+      //     return this.db.global[key];
+      //   },
+      //   set: (key: ContextKey, val: any) => {
+      //     this.db.global[key] = val;
+      //   }
+      // },
       node: {
         error: (...args: any) => {},
         warn: (...args: any) => {},
@@ -57,24 +63,25 @@ export class NodeRedOptsMock {
         done: () => {}
       }
     };
+    this.db.global = g;
   }
 
   setStates(states: Dict): this {
-    this.db.global.homeassistant.states = states;
+    this.db.global.homeassistant.homeAssistant.states = states;
     return this;
   }
 
   getEntity(entityId: EntityId): Dict {
-    return this.db.global.homeassistant.states[entityId];
+    return this.db.global.homeassistant.homeAssistant.states[entityId];
   }
 
   setEntity(entityId: EntityId, val: any): this {
-    this.db.global.homeassistant.states[entityId] = val;
+    this.db.global.homeassistant.homeAssistant.states[entityId] = val;
     return this;
   }
 
   setState(entityId: EntityId, state: any): this {
-    this.db.global.homeassistant.states[entityId] = { state: state };
+    this.db.global.homeassistant.homeAssistant.states[entityId] = { state: state };
     return this;
   }
 

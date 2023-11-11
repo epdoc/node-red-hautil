@@ -1,6 +1,5 @@
 import { Dict, Integer } from 'epdoc-util';
-import { FunctionNodeBase } from './function-node-base';
-import { EntityDomain, EntityId, EntityService, NodeRedOpts } from './types';
+import { EntityDomain, EntityId, EntityService } from './types';
 
 export type ServicePayloadTarget = {
   entity_id: EntityId;
@@ -21,33 +20,21 @@ export type ServicePayload = {
   data?: ServiceDataDict;
 };
 
-export function newService(entity_id: EntityId, opts?: NodeRedOpts): Service {
-  return new Service(entity_id, opts);
+export function newService(entity_id: EntityId): Service {
+  return new Service(entity_id);
 }
 
 /**
  * Payload builder for Call Service node.
  */
-export class Service extends FunctionNodeBase {
+export class Service {
   protected _payload: ServicePayload = { target: { entity_id: '' } };
 
   /**
    * Create a new Service object that is used to create a payload that can be
    * passed to a Call Service node.
-   * @param {string} entity_id (required) Can be either the full entity_id of
-   * the entity to be controlled (e.g. 'fan.bedroom'), or a partial name (e.g.
-   * 'bedroom'). just contain the later part of the entity_id (eg. 'bedroom').
-   * @param {function} opts.warn (optional) A logging function for logging
-   * warnings. The function takes a single string parameter.
-   * @param {function} opts.log (optional) A logging function for logging info
-   * messages. The function takes a single string parameter.
-   * @param {function} opts.domain (optional) The domain of the entity, if not
-   * specified in the entity_id.
-   * @param {string} domain Required if domain is not part of entity_id  (e.g.
-   * entity_id is 'bedroom' rather than 'fan.bedroom').
    */
-  constructor(entity_id: EntityId, opts?: NodeRedOpts) {
-    super(opts);
+  constructor(entity_id: EntityId) {
     this.initPayload(entity_id);
   }
 
@@ -132,7 +119,7 @@ export class Service extends FunctionNodeBase {
   value(val: any): this {
     this._payload.service = 'set_value';
     this._payload.data = {
-      value: val,
+      value: val
     };
     return this;
   }
@@ -147,7 +134,7 @@ export class Service extends FunctionNodeBase {
   date(val: Date): this {
     this._payload.service = 'set_datetime';
     this._payload.data = {
-      timestamp: Math.round(val.getTime() / 1000),
+      timestamp: Math.round(val.getTime() / 1000)
     };
     return this;
   }

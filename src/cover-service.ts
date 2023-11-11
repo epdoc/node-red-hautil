@@ -1,8 +1,8 @@
 import { Service } from './service';
-import { EntityDomain, EntityId, NodeRedOpts } from './types';
+import { EntityDomain, EntityId } from './types';
 
-export function newCoverService(entity_id: EntityId, opts?: NodeRedOpts) {
-  return new CoverService(entity_id, opts);
+export function newCoverService(entity_id: EntityId) {
+  return new CoverService(entity_id);
 }
 
 /**

@@ -1,25 +1,26 @@
 import { isDict, isObject } from 'epdoc-util';
-import { HA, HaSensorDict, NodeRedOptsMock, newFanSpeed6Service, newService } from '../src';
+import { HA, HaSensorDict, newFanSpeed6Service, newService } from '../src';
+import { NodeRedGlobalMock } from '../src/node-red-global-mock';
 
 describe('ha', () => {
-  const mock: NodeRedOptsMock = new NodeRedOptsMock();
+  const mock: NodeRedGlobalMock = new NodeRedGlobalMock();
 
   describe('entity', () => {
     mock.setStates({
       entity4: {
-        state: '3.22',
+        state: '3.22'
       },
       entity3: {
-        state: '3.22',
+        state: '3.22'
       },
       entity2: {
-        state: 'on',
+        state: 'on'
       },
       entity1: {
-        state: 'off',
-      },
+        state: 'off'
+      }
     });
-    let ha = new HA(mock.opts);
+    let ha = new HA(mock);
 
     it('isEntityOn', () => {
       expect(ha.entity('entity2').isOn()).toEqual(true);
@@ -37,7 +38,7 @@ describe('ha', () => {
         e1: { id: 'entity1' },
         e2: { id: 'entity2' },
         e3: { id: 'entity3', type: 'number' },
-        e4: { id: 'entity4', type: 'int' },
+        e4: { id: 'entity4', type: 'int' }
       };
       ha.retrieveSensorsData(dict);
       expect(isObject(dict.e1.entity)).toEqual(true);
@@ -57,23 +58,23 @@ describe('ha', () => {
 
   describe('service payload', () => {
     it('light on', () => {
-      const s = newService('light.entity3', mock.opts);
+      const s = newService('light.entity3');
       const p = s.service('turn_on').payload();
       expect(isObject(p)).toEqual(true);
       expect(p).toEqual({
         target: { entity_id: 'light.entity3' },
         domain: 'light',
-        service: 'turn_on',
+        service: 'turn_on'
       });
     });
     it('fan speed', () => {
-      const p = newFanSpeed6Service('entity4', mock.opts).speed(3).payload();
+      const p = newFanSpeed6Service('entity4').speed(3).payload();
       expect(isObject(p)).toEqual(true);
       expect(p).toEqual({
         target: { entity_id: 'fan.entity4' },
         domain: 'fan',
         service: 'set_percentage',
-        data: { percentage: 50 },
+        data: { percentage: 50 }
       });
     });
   });
