@@ -9,8 +9,12 @@ export class EntityState {
     this._state = state;
   }
 
-  isValid(): boolean {
-    return isDefined(this._state);
+  isValid(): this is EntityState {
+    return EntityState.isEntityState(this);
+  }
+
+  static isEntityState(val: any): val is EntityState {
+    return val && isDefined(val._state);
   }
 
   equals(val: any): boolean {

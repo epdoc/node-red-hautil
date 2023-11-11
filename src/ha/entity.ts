@@ -39,15 +39,19 @@ export class Entity {
     return this._attributes;
   }
 
-  isValid(): boolean {
-    return isDefined(this._entity) && isDefined(this._state) && this._state.isValid();
+  isValid(): this is Entity {
+    return Entity.isEntity(this);
   }
 
-  get entityId(): EntityId | undefined {
-    return this._entity ? this._entity.entity_id : undefined;
+  static isEntity(val: any): val is Entity {
+    return val && isDefined(val._entity) && isDefined(val._state) && val._state.isValid();
   }
 
-  get name(): string | undefined {
+  get entityId(): EntityId {
+    return this._entity ? this._entity.entity_id : 'undefined';
+  }
+
+  get name(): string {
     return this._entity && this._entity.attributes && this._entity.attributes.friendly_name
       ? this._entity.attributes.friendly_name
       : this.entityId;

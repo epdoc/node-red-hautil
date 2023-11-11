@@ -35,10 +35,10 @@ export class NodeRedGlobalMock extends NodeRedContextMock implements NodeRedGlob
   //   return this;
   // }
 
-  // setState(entityId: EntityId, state: any): this {
-  //   this.db.homeassistant.homeAssistant.states[entityId] = { state: state };
-  //   return this;
-  // }
+  setState(entityId: EntityId, state: any): this {
+    this.db.homeassistant.homeAssistant.states[entityId] = { state: state };
+    return this;
+  }
 
   getState(entityId: EntityId): any {
     const entity = this.getEntity(entityId);
