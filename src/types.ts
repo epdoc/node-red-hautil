@@ -18,7 +18,7 @@ export type NodeRedLogFunction = (...args: any) => void;
 export type NodeRedSendFunction = (msg: NodeRedMessage | NodeRedMessage[]) => void | Promise<void>;
 export type NodeRedDoneFunction = () => void;
 
-export interface NodeRedEnvObject {
+export interface NodeRedEnvApi {
   get: (key: EnvKey) => any;
 }
 export interface NodeRedFlowApi {
@@ -42,14 +42,21 @@ export interface NodeRedNodeApi {
   send: NodeRedSendFunction;
   done: () => void;
 }
+export function isNodeRedNodeApi(val: any): val is NodeRedNodeApi {
+  return val && val.send && val.done && val.warn;
+}
+
 /**
  * Node-RED environment information that depends on context (not global)
  */
 export type NodeRedContextApi = {
-  env: NodeRedEnvObject;
+  env: NodeRedEnvApi;
   flow: NodeRedFlowApi;
   node: NodeRedNodeApi;
 };
+export function isNodeRedContextApi(val: any): val is NodeRedContextApi {
+  return val && val.env && val.flow && val.node;
+}
 /**
  * Type guard. Tests if val is a valid NodeRedOpts object.
  * @param val

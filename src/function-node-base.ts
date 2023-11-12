@@ -1,11 +1,11 @@
-import { NodeRedContextApi, NodeRedEnvObject, NodeRedFlowApi, NodeRedGlobalApi, NodeRedNodeApi } from '.';
+import { NodeRedContextApi, NodeRedEnvApi, NodeRedFlowApi, NodeRedGlobalApi, NodeRedNodeApi } from '.';
 
 /**
  * Super class to use in our classes that support logging using node.warn and node.info.
  * For debug messages, only warn and error appear to be supported by Node-RED.
  */
 export class FunctionNodeBase {
-  protected env: NodeRedEnvObject;
+  protected env: NodeRedEnvApi;
   protected flow: NodeRedFlowApi;
   protected global: NodeRedGlobalApi;
   protected node: NodeRedNodeApi;

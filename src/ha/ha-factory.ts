@@ -6,13 +6,13 @@ export function newHAFactory(global: NodeRedGlobalApi): HAFactory {
 }
 
 export class HAFactory {
-  private _global: NodeRedGlobalApi;
+  protected _global: NodeRedGlobalApi;
 
   constructor(global: NodeRedGlobalApi) {
     this._global = global;
   }
 
-  newHA() {
+  make() {
     return new HA(this._global);
   }
 }

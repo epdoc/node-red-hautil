@@ -21,7 +21,7 @@ describe('ha', () => {
       }
     });
     let factory = newHAFactory(mock);
-    let ha = factory.newHA();
+    let ha = factory.make();
 
     it('isEntityOn', () => {
       expect(ha.entity('entity2').isOn()).toEqual(true);

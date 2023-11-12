@@ -1,10 +1,10 @@
 import { Dict } from 'epdoc-util';
-import { EnvKey, NodeRedEnvObject } from '../types';
+import { EnvKey, NodeRedEnvApi } from '../types';
 
 /**
  * A class to build a mock NodeRedOpts object for testing.
  */
-export class NodeRedEnvMock implements NodeRedEnvObject {
+export class NodeRedEnvMock implements NodeRedEnvApi {
   private db: Dict = {};
 
   constructor() {}
