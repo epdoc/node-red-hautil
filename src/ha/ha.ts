@@ -61,7 +61,10 @@ export class HA {
   entity(entity_id: EntityId): Entity {
     if (this._ha.states.hasOwnProperty(entity_id)) {
       const item: any = this._ha.states[entity_id];
+      // console.log(`found ${entity_id} ${JSON.stringify(item)}`);
       return new Entity(item);
+      // } else {
+      //   console.log(`Not found ${entity_id}`);
     }
     return new Entity();
   }

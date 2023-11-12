@@ -1,4 +1,4 @@
-import { Dict, Integer, isDefined, isInteger, isNumber, isString } from 'epdoc-util';
+import { Dict, Integer, deepCopy, isDefined, isInteger, isNumber, isString } from 'epdoc-util';
 
 export type HAEntityStateData = 'on' | 'off' | number | string | Dict;
 
@@ -54,5 +54,13 @@ export class EntityState {
 
   value(): any {
     return this._state;
+  }
+
+  toObject(): Dict {
+    return deepCopy(this._state);
+  }
+
+  stringify(): string {
+    return JSON.stringify(this.toObject());
   }
 }

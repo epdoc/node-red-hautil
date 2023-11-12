@@ -1,12 +1,11 @@
 import { isDict, isObject } from 'epdoc-util';
-import { HaSensorDict, newFanSpeed6Service, newHAFactory, newService } from '../src';
+import { HA, HaSensorDict, newFanSpeed6Service, newHAFactory, newService } from '../src';
 import { NodeRedGlobalMock } from '../src/mocks/node-red-global-mock';
 
 describe('ha', () => {
-  const mock: NodeRedGlobalMock = new NodeRedGlobalMock();
-
   describe('entity', () => {
-    mock.setStates({
+    const gMock: NodeRedGlobalMock = new NodeRedGlobalMock();
+    gMock.setStates({
       entity4: {
         state: '3.22'
       },
@@ -20,7 +19,7 @@ describe('ha', () => {
         state: 'off'
       }
     });
-    let factory = newHAFactory(mock);
+    let factory = newHAFactory(gMock);
     let ha = factory.make();
 
     it('isEntityOn', () => {
@@ -77,6 +76,63 @@ describe('ha', () => {
         service: 'set_percentage',
         data: { percentage: 50 }
       });
+    });
+  });
+
+  describe.only('gMock', () => {
+    const gMock = new NodeRedGlobalMock();
+    const haFactory = newHAFactory(gMock);
+    gMock
+      .setEntity('input_boolean.lightning', {
+        entity_id: 'input_boolean.lightning',
+        state: 'on'
+      })
+      .setEntity('switch.away_room', {
+        entity_id: 'switch.away_room',
+        state: 'on',
+        attributes: { friendly_name: 'Away Room Fan' }
+      })
+      .setEntity('fan.away_room', {
+        entity_id: 'fan.away_room',
+        state: 'on'
+      })
+      .setEntity('fan.workshop', {
+        entity_id: 'fan.workshop',
+        state: 'off'
+      });
+    let ha: HA = haFactory.make();
+
+    it('setEntity', () => {
+      const entity1 = ha.entity('switch.away_room');
+      // console.log(`entity1 from ha: ${entity1.stringify()}`);
+      // console.log(`entity1 from db: ${JSON.stringify(gMock.getEntity('switch.away_room'))}`);
+      expect(entity1.entityId).toEqual('switch.away_room');
+      expect(entity1.name).toEqual('Away Room Fan');
+      expect(entity1.value()).toEqual('on');
+
+      const entity3 = ha.entity('input_boolean.lightning');
+      // console.log(`entity3 from ha: ${entity3.stringify()}`);
+      expect(entity3.entityId).toEqual('input_boolean.lightning');
+      expect(entity3.name).toEqual('input boolean lightning');
+      expect(entity3.value()).toEqual('on');
+
+      const entity2 = ha.entity('fan.workshop');
+      // console.log(`entity2 from ha: ${entity2.stringify()}`);
+      expect(entity2.entityId).toEqual('fan.workshop');
+      expect(entity2.name).toEqual('fan workshop');
+      expect(entity2.value()).toEqual('off');
+    });
+    it('setEntityStateValue', (done) => {
+      gMock.setEntityStateValue('switch.away_room', 'off');
+      const entity1 = ha.entity('switch.away_room');
+      // console.log(`entity1 from ha: ${entity1.stringify()}`);
+      // console.log(`entity1 from db: ${JSON.stringify(gMock.getEntity('switch.away_room'))}`);
+      expect(entity1.entityId).toEqual('switch.away_room');
+      expect(entity1.name).toEqual('Away Room Fan');
+      expect(entity1.value()).toEqual('off');
+      expect(entity1.isOn()).toEqual(false);
+      expect(entity1.isOff()).toEqual(true);
+      done();
     });
   });
 });

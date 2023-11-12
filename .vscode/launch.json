@@ -7,11 +7,20 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch Program",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
+      "name": "Launch location.history.test.js",
+      "skipFiles": ["<node_internals>/**"],
       "program": "${workspaceFolder}/test/location.history.test.js"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch ha.test.ts",
+      "program": "${workspaceFolder}/dist/test/ha.test.js",
+      "runtimeArgs": ["--inspect-brk", "${workspaceRoot}/node_modules/.bin/jest", "--runInBand"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "preLaunchTask": "tsc: build - tsconfig.json"
+      // "outFiles": ["${workspaceFolder}/dist/**/*.js"]
     }
   ]
 }

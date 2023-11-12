@@ -1,4 +1,4 @@
-import { Dict, isDefined, isNumber } from 'epdoc-util';
+import { Dict, deepCopy, isDefined, isNumber } from 'epdoc-util';
 
 export type HAEntityAttributesData = Dict & {
   friendly_name: string;
@@ -22,8 +22,8 @@ const STATE_IS_NUMBER = ['measurement'];
 export class EntityAttributes {
   private _attributes: HAEntityAttributesData | undefined;
 
-  constructor(state: HAEntityAttributesData | undefined) {
-    this._attributes = state;
+  constructor(val: HAEntityAttributesData | undefined) {
+    this._attributes = val;
   }
 
   isValid(): boolean {
@@ -32,6 +32,10 @@ export class EntityAttributes {
 
   toString(): string {
     return String(this._attributes);
+  }
+
+  get name(): string | undefined {
+    return this._attributes ? this._attributes.friendly_name : undefined;
   }
 
   percentage(defval: number = 0): number {
@@ -46,5 +50,12 @@ export class EntityAttributes {
       return true;
     }
     return false;
+  }
+
+  toObject(): Dict {
+    return deepCopy(this._attributes);
+  }
+  stringify(): string {
+    return JSON.stringify(this.toObject());
   }
 }

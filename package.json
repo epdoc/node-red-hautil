@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "General Purpose Node-RED utils for Home Assistant",
   "private": false,
-  "main": "dist/index.js",
+  "main": "dist/src/index.js",
   "keywords": [
     "util",
     "nodered",
@@ -20,7 +20,7 @@
   },
   "scripts": {
     "build": "rm -rf dist && tsc",
-    "test": "jest",
+    "test": "jest --env=node --colors --coverage test",
     "clean": "rm -rf dist docs coverage && echo 'Done.'",
     "coverage": "bun test --coverage",
     "format": "prettier --write 'src/**/*.ts'",

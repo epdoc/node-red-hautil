@@ -1,4 +1,5 @@
 import { Dict } from 'epdoc-util';
+import { HAEntityData } from '../ha';
 import { EntityId, NodeRedGlobalApi } from '../types';
 import { NodeRedContextMock } from './node-red-context-mock';
 
@@ -21,22 +22,42 @@ export class NodeRedGlobalMock extends NodeRedContextMock implements NodeRedGlob
     return this.db.homeassistant;
   }
 
+  get states(): Dict {
+    return this.db.homeassistant.homeAssistant.states;
+  }
+
   setStates(states: Dict): this {
-    this.db.homeassistant.homeAssistant.states = states;
+    Object.keys(states).forEach((entityId) => {
+      this.setEntity(entityId, states[entityId]);
+    });
     return this;
   }
 
   getEntity(entityId: EntityId): Dict {
-    return this.db.homeassistant.homeAssistant.states[entityId];
+    return this.states[entityId];
   }
 
-  // setEntity(entityId: EntityId, val: any): this {
-  //   this.db.homeassistant.homeAssistant.states[entityId] = val;
-  //   return this;
-  // }
+  setEntity(entityId: EntityId, val: HAEntityData | Dict): this {
+    if (!val.entity_id) {
+      val.entity_id = entityId;
+    }
+    if (!val.attributes) {
+      val.attributes = { friendly_name: entityId.replace('.', ' ').replace('_', ' ') };
+    }
+    if (!val.attributes.friendly_name) {
+      val.attributes.friendly_name = entityId.replace('.', ' ').replace('_', ' ');
+    }
+    this.states[entityId] = val;
+    // console.log(`Set ${entityId} to ${JSON.stringify(val)}`);
+    return this;
+  }
 
-  setState(entityId: EntityId, state: any): this {
-    this.db.homeassistant.homeAssistant.states[entityId] = { state: state };
+  setEntityStateValue(entityId: EntityId, state: any): this {
+    if (!this.states[entityId]) {
+      this.setEntity(entityId, { state: state });
+    } else {
+      this.states[entityId].state = state;
+    }
     return this;
   }
 

@@ -1,4 +1,4 @@
-import { Dict, Integer, isDefined } from 'epdoc-util';
+import { Dict, Integer, deepCopy, isDefined } from 'epdoc-util';
 import { FanSpeed6Service } from '../services/fan-speed6-service';
 import { EntityId } from '../types';
 import { EntityAttributes, HAEntityAttributesData } from './entity-attributes';
@@ -51,10 +51,8 @@ export class Entity {
     return this._entity ? this._entity.entity_id : 'undefined';
   }
 
-  get name(): string {
-    return this._entity && this._entity.attributes && this._entity.attributes.friendly_name
-      ? this._entity.attributes.friendly_name
-      : this.entityId;
+  get name(): string | undefined {
+    return this._attributes.name;
   }
 
   exists(): boolean {
@@ -93,5 +91,15 @@ export class Entity {
   }
   get lastUpdated(): Date {
     return this._entity ? new Date(this._entity.last_updated) : new Date(0);
+  }
+
+  toObject(): Dict {
+    let result: Dict = deepCopy(this._entity);
+    result.state = this._state.toObject();
+    result.attributes = this._attributes.toObject();
+    return result;
+  }
+  stringify(): string {
+    return JSON.stringify(this.toObject());
   }
 }
