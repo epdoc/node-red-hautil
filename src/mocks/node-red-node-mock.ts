@@ -1,4 +1,4 @@
-import { NodeRedMessage, NodeRedNodeApi } from '../types';
+import { NodeRedNodeApi } from '../types';
 
 export class NodeRedNodeMock implements NodeRedNodeApi {
   constructor() {}
@@ -13,7 +13,7 @@ export class NodeRedNodeMock implements NodeRedNodeApi {
 
   log(...args: any) {}
 
-  send(msg: NodeRedMessage | NodeRedMessage[]) {}
+  send(...args: any) {}
 
   done() {}
 }

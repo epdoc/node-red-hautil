@@ -1,4 +1,5 @@
-import { Dict, isDict } from 'epdoc-util';
+import { isDict } from 'epdoc-util';
+import { NodeMessage } from 'node-red';
 
 export type EntityId = string; // Example 'light.master_bedroom'
 export type EntityShortId = string; // The EntityId without the domain prepended (eg. 'master_bedroom')
@@ -6,17 +7,18 @@ export type EntityDomain = string; // Example 'light'
 export type EntityService = string; // Example 'turn_on' or 'turn_off' or 'toggle'
 export type EntityShortService = string; // Example 'on' or 'off'
 
-export type NodeRedMessage = Dict & {
-  payload: any;
-};
 export type EnvKey = string;
 export type ContextKey = string;
 export type ContextStorageType = 'file' | 'memory';
-export type NodeRedContextGetFunction = (key: ContextKey, type?: ContextStorageType) => any | Promise<any>;
-export type NodeRedContextSetFunction = (key: ContextKey, data: any, type?: ContextStorageType) => void | Promise<void>;
+export type NodeRedContextGetFunction = (key: ContextKey, storeName?: ContextStorageType) => any | Promise<any>;
+export type NodeRedContextSetFunction = (
+  key: ContextKey,
+  data: any,
+  storeName?: ContextStorageType
+) => void | Promise<void>;
 export type NodeRedLogFunction = (...args: any) => void;
-export type NodeRedSendFunction = (msg: NodeRedMessage | NodeRedMessage[]) => void | Promise<void>;
-export type NodeRedDoneFunction = () => void;
+export type NodeRedSendFunction = (msg: NodeMessage | Array<NodeMessage | NodeMessage[] | null>) => void;
+export type NodeRedDoneFunction = (err?: Error) => void;
 
 export interface NodeRedEnvApi {
   get: (key: EnvKey) => any;
