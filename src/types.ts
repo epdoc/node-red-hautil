@@ -17,8 +17,8 @@ export type NodeRedContextSetFunction = (
   storeName?: ContextStorageType
 ) => void | Promise<void>;
 export type NodeRedLogFunction = (...args: any) => void;
-export type NodeRedSendFunction = (msg: NodeMessage | Array<NodeMessage | NodeMessage[] | null>) => void;
-export type NodeRedDoneFunction = (err?: Error) => void;
+export type NodeSend = (msg: NodeMessage | Array<NodeMessage | NodeMessage[] | null>) => void;
+export type NodeDone = (err?: Error) => void;
 
 export interface NodeRedEnvApi {
   get: (key: EnvKey) => any;
@@ -41,8 +41,8 @@ export interface NodeRedNodeApi {
   debug: NodeRedLogFunction;
   trace: NodeRedLogFunction;
   log: NodeRedLogFunction;
-  send: NodeRedSendFunction;
-  done: () => void;
+  send: NodeSend;
+  done: NodeDone;
 }
 export function isNodeRedNodeApi(val: any): val is NodeRedNodeApi {
   return val && val.send && val.done && val.warn;

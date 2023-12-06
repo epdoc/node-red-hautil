@@ -1,5 +1,8 @@
 # epdoc-node-red-hautil
 
+<span style="color:gold">**THIS PROJECT IS STILL IN DEVELOPMENT AND SHOULD NOT BE USED IN PRODUCTION. 
+All APIs and documentaion are subject to change.**</span>
+
 General purpose utilities for use with [Node-RED](https://nodered.org/) and
 [Home Assistant](https://www.home-assistant.io/).
 
