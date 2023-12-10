@@ -1,5 +1,5 @@
 import { Dict } from 'epdoc-util';
-import { NodeRedGlobalApi } from './types';
+import { NodeContextGlobalData } from './types';
 
 export * from './function-node-base';
 export * from './ha';
@@ -12,7 +12,7 @@ export * from './types';
  * @param global The global object.
  * @param modules A dictionary of modules to load.
  */
-export function loadModules(global: NodeRedGlobalApi, modules: Dict) {
+export function loadModules(global: NodeContextGlobalData, modules: Dict) {
   const lib: Dict = {};
   const fail: string[] = [];
   Object.keys(modules).forEach((key) => {

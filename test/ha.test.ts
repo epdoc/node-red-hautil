@@ -19,6 +19,7 @@ describe('ha', () => {
         state: 'off'
       }
     });
+    // @ts-ignore
     let factory = newHAFactory(gMock);
     let ha = factory.make();
 
@@ -81,6 +82,7 @@ describe('ha', () => {
 
   describe.only('gMock', () => {
     const gMock = new NodeRedGlobalMock();
+    // @ts-ignore
     const haFactory = newHAFactory(gMock);
     gMock
       .setEntity('input_boolean.lightning', {

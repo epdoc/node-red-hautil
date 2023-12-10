@@ -1,18 +1,19 @@
 import { Dict } from 'epdoc-util';
-import { ContextKey, ContextStorageType } from '../types';
+import { ContextKey, ContextStorageType, NodeContextDataMin } from '../types';
 
 /**
  * A class to build a mock Node-RED context object for testing.
  */
-export class NodeRedContextMock {
+export class NodeRedContextMock implements NodeContextDataMin {
   public db: Dict = {};
 
   constructor() {}
 
-  get(key: ContextKey, type: ContextStorageType = 'memory'): any {
+  get(key: ContextKey, storeName?: ContextStorageType): unknown {
     return this.db[key];
   }
-  set(key: ContextKey, val: any, type: ContextStorageType = 'memory'): void {
+
+  set(key: ContextKey, val: unknown): void {
     this.db[key] = val;
   }
 }

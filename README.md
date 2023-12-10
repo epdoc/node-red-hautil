@@ -152,9 +152,7 @@ entities.
 Example retrieves the state of a light.
 
 ```js
-const gHA = global.get('homeassistant');
-
-const ha = new HA(gHA);
+const ha = new HA(global,'homeAssistant');
 const lightEntity = ha.entity('light.bedroom');
 const isOn = lightEntity.isOn();
 node.warn(`The ${lightEntity.id} is ${isOn?'on':'off'}`)
@@ -169,7 +167,8 @@ data for, and you need to access that data more than once.
 
 ```js
 const gHA = global.get('homeassistant');
-const ha = new HA(gHA);
+const homeAssistant:HomeAssistant = gHA['homeAssistant']
+const ha = new HA(homeAssistant);
 
 const sensorDict = {
   sensor1: { id: 'input_boolean.evening', type: 'boolean' },
@@ -188,8 +187,7 @@ if( sensorDict.sensor2.val > 30 ) {
 The above code is equivalent to the following:
 
 ```js
-const gHA = global.get('homeassistant');
-const ha = new HA(gHA);
+const ha = new HA(global);
 
 if( ha.entity('input_boolean.evening').isOn() ) {
   console.log('It is the evening');
