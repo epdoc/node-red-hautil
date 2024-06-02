@@ -1,7 +1,7 @@
 {
-  "name": "epdoc-node-red-hautil",
-  "version": "1.0.4",
-  "description": "General Purpose Node-RED utils for Home Assistant",
+  "name": "@epdoc/node-red-hautil",
+  "version": "1.0.5",
+  "description": "General Purpose Node-RED utils for use in Home Assistant Function Nodes",
   "private": false,
   "main": "dist/src/index.js",
   "keywords": [
@@ -16,7 +16,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jpravetz/epdoc-node-red-hautil.git"
+    "url": "git+https://github.com/epdoc/node-red-hautil.git"
   },
   "scripts": {
     "build": "rm -rf dist && tsc",
