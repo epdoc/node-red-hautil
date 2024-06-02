@@ -1,6 +1,6 @@
-# epdoc-node-red-hautil
+# @epdoc/node-red-hautil
 
-<span style="color:gold">**THIS PROJECT IS STILL IN DEVELOPMENT AND SHOULD NOT BE USED IN PRODUCTION. 
+<span style="color:gold">**THIS PROJECT IS STILL IN DEVELOPMENT. 
 All APIs and documentaion are subject to change.**</span>
 
 General purpose utilities for use with [Node-RED](https://nodered.org/) and
