@@ -1,8 +1,14 @@
-import { EntityId, NodeRedGlobalApi } from '../types';
+import { Dict, isDict, isFunction, isObject } from '@epdoc/typeutil';
+import { EntityId, NodeContextGlobalData, isNodeContextData } from '../types';
 import { Entity } from './entity';
 import { EntityState } from './entity-state';
 
-export type HomeAssistant = any;
+export interface HomeAssistant {
+  states: Record<EntityId, Entity>;
+}
+export function isHomeAssistant(val: any): val is HomeAssistant {
+  return isObject(val) && isDict(val.states) && isFunction(val.get);
+}
 export type HaSensorDictEntry = {
   id: EntityId;
   name?: string;
@@ -23,24 +29,40 @@ export class HA {
 
   /**
    *
-   * @param {Object} globalHomeAssistant The value of global.get('homeassistant')
-   * @param {Function} options.log Function that takes a string as a parameter and that outputs log messages.
+   * @param val A global NodeContextData object (with methods get, set, keys) or
+   * a HomeAssistant object (with property `states`).
+   * @param server If val is global, then the HomeAssistant object is retrieved
+   * from global.get('homeassistant')[server]
    */
-  constructor(global: NodeRedGlobalApi) {
-    const gHA = global.get('homeassistant');
-    if (gHA) {
-      this._ha = gHA.homeAssistant;
+  constructor(val: NodeContextGlobalData | HomeAssistant, server: string = 'homeAssistant') {
+    if (isHomeAssistant(val)) {
+      this._ha = val;
+    } else if (isNodeContextData(val)) {
+      const gHA: Dict = val.get('homeassistant') as Dict;
+      if (gHA) {
+        const haKeys = Object.keys(gHA);
+        if (haKeys && haKeys.length === 1) {
+          this._ha = gHA[haKeys[0]];
+        } else if (haKeys && haKeys.length > 1) {
+          this._ha = gHA[server];
+        }
+      }
     }
-    if (!gHA) {
-      throw new Error('Home Assistant global not found');
-    }
-    if (!gHA || !this._ha) {
-      throw new Error('Home Assistant context not found');
-    }
-    if (!gHA || !this._ha || !this._ha.states) {
-      throw new Error('Home Assistant entity states not found');
+    // @ts-ignore
+    if (!isHomeAssistant(this._ha)) {
+      throw new Error('Home Assistant context not found' + JSON.stringify(val, null, 2));
     }
   }
+
+  // constructor(ha: HomeAssistant) {
+  //   this._ha = ha;
+  //   if (!this._ha) {
+  //     throw new Error('Home Assistant context not found');
+  //   }
+  //   if (!this._ha || !this._ha.states) {
+  //     throw new Error('Home Assistant entity states not found');
+  //   }
+  // }
 
   // xx() {
   //   const gHA = global.get('homeassistant');

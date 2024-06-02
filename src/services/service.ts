@@ -1,4 +1,4 @@
-import { Dict, Integer } from 'epdoc-util';
+import { Dict, Integer } from '@epdoc/typeutil';
 import { EntityDomain, EntityId, EntityService } from '../types';
 
 export type ServicePayloadTarget = {

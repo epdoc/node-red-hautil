@@ -1,12 +1,13 @@
-import { Dict } from 'epdoc-util';
+import { Dict } from '@epdoc/typeutil';
 import { HAEntityData } from '../ha';
-import { EntityId, NodeRedGlobalApi } from '../types';
+import { EntityId } from '../types';
 import { NodeRedContextMock } from './node-red-context-mock';
 
 /**
  * A class to build a mock NodeRedOpts object for testing.
  */
-export class NodeRedGlobalMock extends NodeRedContextMock implements NodeRedGlobalApi {
+// @ts-ignore
+export class NodeRedGlobalMock extends NodeRedContextMock {
   constructor() {
     super();
     this.db = {

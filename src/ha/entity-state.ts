@@ -1,4 +1,4 @@
-import { Dict, Integer, deepCopy, isDefined, isInteger, isNumber, isString } from 'epdoc-util';
+import { Dict, Integer, deepCopy, isDefined, isInteger, isNumber, isString } from '@epdoc/typeutil';
 
 export type HAEntityStateData = 'on' | 'off' | number | string | Dict;
 

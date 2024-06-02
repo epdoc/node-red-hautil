@@ -1,4 +1,4 @@
-import { NodeRedContextApi, NodeRedEnvApi, NodeRedFlowApi, NodeRedGlobalApi, NodeRedNodeApi } from '.';
+import { NodeContextFlowData, NodeContextGlobalData, NodeRedContextApi, NodeRedEnvApi, NodeRedNodeApi } from '.';
 
 /**
  * Super class to use in our classes that support logging using node.warn and node.info.
@@ -6,17 +6,19 @@ import { NodeRedContextApi, NodeRedEnvApi, NodeRedFlowApi, NodeRedGlobalApi, Nod
  */
 export class FunctionNodeBase {
   protected env: NodeRedEnvApi;
-  protected flow: NodeRedFlowApi;
-  protected global: NodeRedGlobalApi;
+  protected flow: NodeContextFlowData;
+  protected global: NodeContextGlobalData;
   protected node: NodeRedNodeApi;
 
-  constructor(global?: NodeRedGlobalApi, opts?: NodeRedContextApi) {
+  constructor(global?: NodeContextGlobalData, opts?: NodeRedContextApi) {
+    // @ts-ignore
     this.global = global
       ? global
       : {
           get: (key, type) => {},
           set: (key, data, type) => {}
         };
+    // @ts-ignore
     this.flow = opts
       ? opts.flow
       : {

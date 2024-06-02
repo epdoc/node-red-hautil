@@ -1,4 +1,4 @@
-import { isDict, isObject } from 'epdoc-util';
+import { isDict, isObject } from '@epdoc/typeutil';
 import { HA, HaSensorDict, newFanSpeed6Service, newHAFactory, newService } from '../src';
 import { NodeRedGlobalMock } from '../src/mocks/node-red-global-mock';
 
@@ -19,6 +19,7 @@ describe('ha', () => {
         state: 'off'
       }
     });
+    // @ts-ignore
     let factory = newHAFactory(gMock);
     let ha = factory.make();
 
@@ -81,6 +82,7 @@ describe('ha', () => {
 
   describe.only('gMock', () => {
     const gMock = new NodeRedGlobalMock();
+    // @ts-ignore
     const haFactory = newHAFactory(gMock);
     gMock
       .setEntity('input_boolean.lightning', {
