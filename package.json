@@ -1,6 +1,6 @@
 {
   "name": "@epdoc/node-red-hautil",
-  "version": "1.2.6",
+  "version": "1.2.7",
   "description": "General Purpose Node-RED utils for Home Assistant",
   "private": false,
   "main": "dist/src/index.js",
@@ -24,7 +24,9 @@
     "clean": "rm -rf dist docs coverage && echo 'Done.'",
     "coverage": "bun test --coverage",
     "format": "prettier --write 'src/**/*.ts'",
-    "docs": "./node_modules/typedoc/bin/typedoc"
+    "docs": "./node_modules/typedoc/bin/typedoc",
+    "prepare": "npm run build",
+    "publish": "npm publish --access public"
   },
   "devDependencies": {
     "@types/jest": "^29.5.7",
