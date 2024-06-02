@@ -1,4 +1,4 @@
-import { isDict, isFunction, isObject } from 'epdoc-util';
+import { isDict, isFunction, isObject } from '@epdoc/typeutil';
 import { NodeMessage } from 'node-red';
 
 export type EntityId = string; // Example 'light.master_bedroom'

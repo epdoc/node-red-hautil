@@ -1,4 +1,4 @@
-import { Dict, isDict, isObject } from 'epdoc-util';
+import { Dict, isDict, isFunction, isObject } from '@epdoc/typeutil';
 import { EntityId, NodeContextGlobalData, isNodeContextData } from '../types';
 import { Entity } from './entity';
 import { EntityState } from './entity-state';
@@ -7,7 +7,7 @@ export interface HomeAssistant {
   states: Record<EntityId, Entity>;
 }
 export function isHomeAssistant(val: any): val is HomeAssistant {
-  return isObject(val) && isDict(val.states);
+  return isObject(val) && isDict(val.states) && isFunction(val.get);
 }
 export type HaSensorDictEntry = {
   id: EntityId;
@@ -39,16 +39,18 @@ export class HA {
       this._ha = val;
     } else if (isNodeContextData(val)) {
       const gHA: Dict = val.get('homeassistant') as Dict;
-      const haKeys = Object.keys(gHA);
-      if (haKeys.length === 1) {
-        this._ha = gHA[haKeys[0]];
-      } else if (haKeys.length > 1) {
-        this._ha = gHA[server];
+      if (gHA) {
+        const haKeys = Object.keys(gHA);
+        if (haKeys && haKeys.length === 1) {
+          this._ha = gHA[haKeys[0]];
+        } else if (haKeys && haKeys.length > 1) {
+          this._ha = gHA[server];
+        }
       }
     }
     // @ts-ignore
     if (!isHomeAssistant(this._ha)) {
-      throw new Error('Home Assistant context not found');
+      throw new Error('Home Assistant context not found' + JSON.stringify(val, null, 2));
     }
   }
 

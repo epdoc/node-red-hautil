@@ -1,4 +1,4 @@
-import { Dict, deepCopy, isDefined, isNumber } from 'epdoc-util';
+import { Dict, deepCopy, isDefined, isNumber } from '@epdoc/typeutil';
 
 export type HAEntityAttributesData = Dict & {
   friendly_name: string;

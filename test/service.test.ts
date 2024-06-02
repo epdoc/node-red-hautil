@@ -1,4 +1,4 @@
-import { isObject } from 'epdoc-util';
+import { isObject } from '@epdoc/typeutil';
 import {
   AlarmService,
   CoverService,

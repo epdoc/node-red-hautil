@@ -1,4 +1,4 @@
-import { Dict } from 'epdoc-util';
+import { Dict } from '@epdoc/typeutil';
 import { NodeContextGlobalData } from './types';
 
 export * from './function-node-base';

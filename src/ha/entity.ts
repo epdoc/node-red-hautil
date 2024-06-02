@@ -1,4 +1,4 @@
-import { Dict, Integer, deepCopy, isDefined } from 'epdoc-util';
+import { Dict, Integer, deepCopy, isDefined } from '@epdoc/typeutil';
 import { FanSpeed6Service } from '../services/fan-speed6-service';
 import { EntityId } from '../types';
 import { EntityAttributes, HAEntityAttributesData } from './entity-attributes';

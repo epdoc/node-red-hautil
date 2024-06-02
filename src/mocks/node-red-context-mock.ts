@@ -1,4 +1,4 @@
-import { Dict } from 'epdoc-util';
+import { Dict } from '@epdoc/typeutil';
 import { ContextKey, ContextStorageType, NodeContextDataMin } from '../types';
 
 /**

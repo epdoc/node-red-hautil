@@ -1,4 +1,4 @@
-import { Integer, isInteger } from 'epdoc-util';
+import { Integer, isInteger } from '@epdoc/typeutil';
 import { EntityId } from '../types';
 import { FanService } from './fan-service';
 

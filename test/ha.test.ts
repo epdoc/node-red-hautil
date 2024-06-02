@@ -1,4 +1,4 @@
-import { isDict, isObject } from 'epdoc-util';
+import { isDict, isObject } from '@epdoc/typeutil';
 import { HA, HaSensorDict, newFanSpeed6Service, newHAFactory, newService } from '../src';
 import { NodeRedGlobalMock } from '../src/mocks/node-red-global-mock';
 

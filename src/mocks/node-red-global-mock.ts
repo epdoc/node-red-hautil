@@ -1,4 +1,4 @@
-import { Dict } from 'epdoc-util';
+import { Dict } from '@epdoc/typeutil';
 import { HAEntityData } from '../ha';
 import { EntityId } from '../types';
 import { NodeRedContextMock } from './node-red-context-mock';
