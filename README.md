@@ -21,7 +21,7 @@ npm run build
 npm run publish
 ```
 
-# Installation and Configuration for use in Standalong Node-RED
+# Installation and Configuration
 
 Standalone Node-RED refers to an instance of a Node-RED server that you've
 installed and configured and that does not use the Home Assistant [Node-RED
@@ -38,8 +38,6 @@ npm install @epdoc/typeutil @epdoc/node-red-hautil
 Start or restart Node-Red. The nodes in
 _node-red-contrib-home-assistant-websocket_ will appear automatically in your node
 list.
-
-## Node-RED running manually
 
 You can use `pm2 start node-red` or
 `pm2 restart node-red`. Or you can add these script commands to your `package.json` file.
@@ -59,6 +57,8 @@ Home Assistant you can restart Node-RED from _Settings > Add-ons > Node-Red_.
 
 For module updates you can edit the version number in `package.json`, delete
 `node_modules/@epdoc/node-red-hautil`, then restart Node-RED.
+
+There are a number of module loading limitations [when using the Node-RED Addon](./NODE-RED.md#using-the-home-assistant-node-red-add-on).
 
 
 ## Configure a Home Assistant Server
@@ -82,7 +82,7 @@ global context, so that you don't need to specify the module in each `Function
 Node` where it is used. 
 
 You can find a discussion of various ways to use your own
-libraries in Node-RED [here](./NODE-RED.md).
+libraries in Node-RED [here](./NODE-RED.md#using-these-external-modules).
 
 # Library Reference
 

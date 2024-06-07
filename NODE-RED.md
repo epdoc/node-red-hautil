@@ -177,8 +177,6 @@ them. You will be tempted to directly edit `package.json`, and will want to edit
 `settings.json` if you want to enable global module loading. I hope to obtain
 clarification on these limitations.
 
-
-
 Ugly workarounds are required. 
 
 What I did at one ugly point in time was to just copy the entire text contents of
