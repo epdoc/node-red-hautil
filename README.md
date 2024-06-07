@@ -13,8 +13,8 @@ General purpose utilities for use with [Node-RED](https://nodered.org/) and
 # Build
 
 ```zsh
-git clone epdoc-node-red-hautil
-cd epdoc-node-red-hautil
+git clone @epdoc/node-red-hautil
+cd node-red-hautil
 npm install
 npm test
 npm run build
@@ -26,7 +26,7 @@ In the Node-Red folder, add these dependencies to _package.json_.
 
 ```zsh
 npm install node-red-contrib-home-assistant-websocket
-npm install @epdoc/typeutil epdoc-node-red-hautil
+npm install @epdoc/typeutil @epdoc/node-red-hautil
 ```
 Start or restart Node-Red. The nodes in
 _node-red-contrib-home-assistant-websocket_ will appear automatically in your node
@@ -43,7 +43,7 @@ If Node-Red is running under
 Home Assistant you can restart Node-RED from _Settings > Add-ons > Node-Red_. 
 
 For module updates you can edit the version number in `package.json`, delete
-`node_modules/epdoc-node-red-hautil`, then restart Node-RED.
+`node_modules/@epdoc/node-red-hautil`, then restart Node-RED.
 
 ## Configure a Home Assistant Server
 

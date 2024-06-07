@@ -90,10 +90,11 @@ locally](https://nodered.org/docs/getting-started/local).
 
 ### Home Assistant with the Node-RED add-on
 
-In this situation  Node-RED is (I believe) running in a container where you don't
-have access to the tools needed (git, yarn, ssh keys). The best way to add
-unpublished packages is to do so on the Home Assistant Settings > Addons > Node-RED >
-Configuration page.
+In this situation  Node-RED is (I believe) running in a container where you
+don't have access to the tools needed (git, yarn, ssh keys). The best way to add
+unpublished packages is to do so on the Home Assistant Settings > Addons >
+Node-RED > Configuration page. Make sure to use this syntax, which includes
+`git+https://` at the beginning.
 
 ```yaml
 npm_packages:
