@@ -1,7 +1,7 @@
 # @epdoc/node-red-hautil
 
 <span style="color:gold">**THIS PROJECT IS STILL IN DEVELOPMENT. 
-All APIs and documentaion are subject to change.**</span>
+All APIs and documentation are subject to change.**</span>
 
 General purpose utilities for use with [Node-RED](https://nodered.org/) and
 [Home Assistant](https://www.home-assistant.io/).
@@ -18,26 +18,41 @@ cd node-red-hautil
 npm install
 npm test
 npm run build
+npm run publish
 ```
 
-# Installation and Configuration for use in Node-RED
+# Installation and Configuration for use in Standalong Node-RED
 
-In the Node-Red folder, add these dependencies to _package.json_.
+Standalone Node-RED refers to an instance of a Node-RED server that you've
+installed and configured and that does not use the Home Assistant [Node-RED
+Addon](https://github.com/hassio-addons/addon-node-red).
+
+In the Node-Red settings folder for your standalone Node-RED deployment, add these
+dependencies to _package.json_.
 
 ```zsh
 npm install node-red-contrib-home-assistant-websocket
 npm install @epdoc/typeutil @epdoc/node-red-hautil
 ```
+
 Start or restart Node-Red. The nodes in
 _node-red-contrib-home-assistant-websocket_ will appear automatically in your node
 list.
 
-### Node-RED running manually
+## Node-RED running manually
 
-If this is your own instance of Node-RED you can use `pm2 start node-red` or
-`pm2 restart node-red`. 
+You can use `pm2 start node-red` or
+`pm2 restart node-red`. Or you can add these script commands to your `package.json` file.
 
-### Node-RED with Home Assistant Add-on
+```json
+  "scripts": {
+    "start": "pm2 start node-red",
+    "restart": "pm2 restart node-red",
+    "stop": "pm2 stop node-red"
+  }
+```
+
+## Node-RED with Home Assistant Add-on
 
 If Node-Red is running under
 Home Assistant you can restart Node-RED from _Settings > Add-ons > Node-Red_. 
@@ -45,9 +60,10 @@ Home Assistant you can restart Node-RED from _Settings > Add-ons > Node-Red_.
 For module updates you can edit the version number in `package.json`, delete
 `node_modules/@epdoc/node-red-hautil`, then restart Node-RED.
 
+
 ## Configure a Home Assistant Server
 
- Drag one of the home assistant nodes onto a flow page. Open the node and add a new `Server` by clicking the pencil icon.
+For a standalone deployment, drag one of the home assistant nodes onto a flow page. Open the node and add a new `Server` by clicking the pencil icon.
 
 On the server `Properties` tab enter the following:
 
@@ -56,102 +72,19 @@ On the server `Properties` tab enter the following:
 - Access Token - Get a long lived access token from the home assistant UI by clicking your profile icon (lower right corner), opening the security tab and scrolling to the bottom of the page.
 - Enable global context store - Enable this so that `global.get('homeassistant')` will work in your function nodes.
 
-Once created, the server settings can be found and edited in the _Configuration Nodes_ tab.
+Once created, the server settings can subsequently be found and edited in the _Configuration Nodes_ tab.
 
 
-## Load epdoc-node-red-hautil
+## Load @epdoc/node-red-hautil
 
-For convenience you can add `epdoc-node-red-hautil` and other utilities to global, so that you don't need
-to specify the module in each `Function Node` where it is used.  Here is code that you can add to `/config/Node-RED/settings.json` for this to work. This uses [dynamic imports](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import).
+For convenience you can add `@epdoc/node-red-hautil` and other utilities to the
+global context, so that you don't need to specify the module in each `Function
+Node` where it is used. 
 
-```js
-let settings = { ... };
-
-async function loadModules() {
-  const names = ['@epdoc/typeutil', '@epdoc/timeutil', '@epdoc/fsutil','epdoc-node-red-hassio', 'epdoc-node-red-hautil'];
-  let jobs = [];
-  names.forEach((name) => {
-    let job = import(name);
-    jobs.push(job);
-  });
-  return Promise.all(jobs).then((resp) => {
-    if (Array.isArray(resp) && resp.length === names.length) {
-      for (let idx = 0; idx < names.length; ++idx) {
-        settings.functionGlobalContext[names[idx]] = resp[idx];
-      }
-    }
-  });
-}
-
-loadModules();
-
-module.exports = settings;
-```
-
-To use the following code in a [Function
-Node](https://nodered.org/docs/user-guide/writing-functions), it's simply a matter of
-accessing the global context to get the module. In this example, the Function
-Node has two outputs, with the 2nd output wired to a [Call Service
-node](https://zachowj.github.io/node-red-contrib-home-assistant-websocket/node/call-service.html).
-
-
-```javascript
-const u = global.get("epdoc-node-red-hautil");
-const payload = u.newLightService('master_bedroom').on().payload();
-node.send([null,{payload:payload}]);
-node.send([msg,null]);
-node.done();
-```
-
-A more convenient way to access the loaded utilities is by adding them to
-globals. Execute the following or equivalent in a function node after waiting 3s
-after Node-RED starts. Use the Inject node and set it to inject once after 3s.
-
-```js
-const modules = {
-    typeutil: '@epdoc/typeutil',
-    timeutil: '@epdoc/timeutil',
-    fsutil: '@epdoc/fsutil',
-    hassio: 'epdoc-node-red-hassio',
-    hautil: 'epdoc-node-red-hautil'
-};
-const lib = loadModules(global,modules);
-// lib.utilFactory = lib.hassio.newNodeRedFlowFactory(global);
-if( lib.load_errors.length ) {
-    node.warn(`Error loading modules ${lib.load_errors.join(', ')}`);
-}
-global.set('epdoc',lib);
-
-function loadModules(global, modules) {
-  const lib = {
-    load_errors: []
-  };
-  const fail = [];
-  Object.keys(modules).forEach((key) => {
-    const pkgName = modules[key];
-    lib[key] = global.get(pkgName);
-    if (!lib[key]) {
-      lib.load_errors.push(pkgName);
-    }
-  });
-  lib.haFactory = lib.hautil.newHAFactory(global);
-  lib.dateUtil = lib.timeutil.dateUtil;
-  lib.durationUtil = lib.timeutil.durationUtil;
-  return lib;
-}
-```
-
-
-```js
-// Function node
-const lib = global.get('epdoc');
-lib.dateUtil(new Date());
-```
-
-Unfortunately there is no code completion in Node-RED's Function Node editor.
-
-You can find a more exhaustive discussion of various ways to use your own
+You can find a discussion of various ways to use your own
 libraries in Node-RED [here](./NODE-RED.md).
+
+# Library Reference
 
 ## Service Class
 
@@ -215,9 +148,8 @@ return msg;
 
 The
 [HA](https://github.com/jpravetz/epdoc-node-red-hautil/blob/master/src/service.tsbond)
-class is again meant for use in Function Nodes. It provides a wrapper for a Home
-Assistant instance, and has methods to access the state of Home Assitant
-entities.
+class provides a wrapper for a Home Assistant instance, and has methods to
+access the state of Home Assitant entities.
 
 Example retrieves the state of a light.
 
@@ -275,16 +207,3 @@ was migrated to TypeScript (developer hint: this resulted in catching quite a
 few bugs). It was also migrated to [Bun](https://bun.sh/) for package management
 and unit testing, however the Typescript Compiler (tsc) is used for module
 generation, due to limitations in bun's bundling options . 
-
-OUTDATED SINCE MOVING TO TSC: Bun generates a different type of module that can only be loaded in
-Node-RED using a [dynamic
-import](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import),
-as you will see in the next section.
-
-```bash
-git clone epdoc-node-red-hautil
-cd epdoc-node-red-hautil
-npm install
-npm test
-npm run build
-```
