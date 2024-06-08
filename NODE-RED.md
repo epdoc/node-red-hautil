@@ -1,5 +1,27 @@
 # Writing reusable code for Node-RED
 
+Node-RED is an attractive automation environment, including for interfacing with Home Assistant. 
+
+Some of it's pros are:
+
+- A rich set of visual tools that are a significant aid in managing your automations.
+- Beats the heck out of writing Home Assistant automations, especially when you
+  can include Function Nodes written in javascript.
+- Ability to run the latest version of javascript inside of Function Nodes
+- A quality code editor within the function node editor
+- Extensibility with custom nodes from many contibutors
+- Good documentation of the basics and for most details
+
+A few cons are:
+
+- Poor granularity for use with source control, throwing everything into a single `flow.json` file.
+- No sophisticated VS Code like way to manage your javascript code
+- No Typescript support
+- No code completion for modules you've loaded
+- Poor documentation and norms for doing more than just a little bit with javascript, including writing custom nodes
+
+Thus it takes a bit of figuring out, and management work, to write and manage your javascript.
+
 Here we document a few strategies for including reusable code in a
 [Node-RED](https://nodered.org/) deployment, and also with [Home
 Assistant](https://www.home-assistant.io/). 
@@ -17,35 +39,35 @@ options here.
 First let's recall we have `CommonJS` modules, loaded using `require`, and newer
 ES6 modules, loaded using `import`.
 
-Node-RED is not able to directly import ES6 modules. But we show you how you can
-work around this limitation using dynamic importas. And without having to create
-CommonJS modules for any of the modules you author. 
+You cannot write Typescript within a Function Node. And Node-RED is not able to
+directly import ES6 modules. But we will show you how you can work around this
+limitation using dynamic imports. And without having to create CommonJS modules
+for any of the modules you author. 
 
-For your own modules, you should probably you use the Typescript compiler.
-[Bun](https://bun.sh/) v1.0 has not been a good alternative because it cannot create
-modules that can be nested and loaded under a parent module that is also created by Bun.
+For your own modules, you should probably you use the Typescript compiler. If
+you are thinking of using [Bun](https://bun.sh/), Bun v1.0 has not been a good
+alternative because it cannot create modules that can be nested and loaded under
+a parent module that is also created by Bun.
 
 
 # Adding reusable code directly to Node-RED
 
-The easiest solution is to just include reusable code in Node-RED by adding it
-to a [Function Node](), adding that code to the global context, then retrieving
-that context from other Function Nodes.
+As stated, the easiest solution is to just include reusable code in Node-RED by
+adding it to a [Function Node](). But you can make is reusable by adding it to
+the global context, then retrieving that context from other Function Nodes.
 
-To do this you might wish to create a new _Library_ flow tab, then add an
-[Inject Node](https://nodered.org/docs/user-guide/nodes#inject) and [Function
-Node](https://nodered.org/docs/user-guide/writing-functions) to the flow. The
-inject node is configured to inject once after 3 seconds, and connects to the
-function node. 
+To do this you might wish to create a new _Library_ flow tab where you place all
+your resusable javascript code. You can use an [Inject
+Node](https://nodered.org/docs/user-guide/nodes#inject) to call a [Function
+Node](https://nodered.org/docs/user-guide/writing-functions) that then
+initializes your code. The inject node waits a few seconds, to allow dynamic
+imports to finish loading. 
 
 ![Global Functions](./www/global_functions.png)
 
-The function node contains code such as the following:
+The function node defines global functions as follows:
 
 ```javascript
-const gHA = global.get("homeassistant");
-const ha = gHA.homeAssistant;
-
 const global_functions = {
 
 	googleDate: function (jsDate) {
@@ -65,8 +87,8 @@ const g = global.get("global_functions");
 node.warn(g.googleDate(new Date()));
 ```
 
-For reusable classes it is perhaps easiest to add a factory method that
-instantiates the class:
+As another example, for reusable classes, it is perhaps easiest to add a factory
+method that instantiates the class:
 
 ```javascript
 function newHA(options) {
