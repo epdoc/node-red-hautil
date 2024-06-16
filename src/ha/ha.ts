@@ -47,10 +47,15 @@ export class HA {
           this._ha = gHA[server];
         }
       }
+    } else {
+      throw new Error(
+        'HA constructor requires either a homeassistant object or a context object, was passed this instead: ' +
+          JSON.stringify(Object.keys(val))
+      );
     }
     // @ts-ignore
     if (!isHomeAssistant(this._ha)) {
-      throw new Error('Home Assistant context not found' + JSON.stringify(val, null, 2));
+      throw new Error('HA construction failed');
     }
   }
 
