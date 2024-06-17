@@ -1,4 +1,4 @@
-import { Dict, isDict, isFunction, isObject } from '@epdoc/typeutil';
+import { Dict, isDict, isObject } from '@epdoc/typeutil';
 import { EntityId, NodeContextGlobalData, isNodeContextData } from '../types';
 import { Entity } from './entity';
 import { EntityState } from './entity-state';
@@ -7,7 +7,7 @@ export interface HomeAssistant {
   states: Record<EntityId, Entity>;
 }
 export function isHomeAssistant(val: any): val is HomeAssistant {
-  return isObject(val) && isDict(val.states) && isFunction(val.get);
+  return isObject(val) && isDict(val.states);
 }
 export type HaSensorDictEntry = {
   id: EntityId;
@@ -25,6 +25,7 @@ export type HaSensorDict = Record<string, HaSensorDictEntry>;
  * Class wraps a home assistant object, for use in Node-RED functions.
  */
 export class HA {
+  // @ts-ignore
   protected _ha: HomeAssistant;
 
   /**
@@ -43,19 +44,25 @@ export class HA {
         const haKeys = Object.keys(gHA);
         if (haKeys && haKeys.length === 1) {
           this._ha = gHA[haKeys[0]];
+          if (!isHomeAssistant(this._ha)) {
+            throw new Error(
+              `The sole home assistant server is not valid, contains ${JSON.stringify(Object.keys(this._ha))}`
+            );
+          }
         } else if (haKeys && haKeys.length > 1) {
           this._ha = gHA[server];
+          if (!isHomeAssistant(this._ha)) {
+            throw new Error(`The home assistant server '${server}' is not valid`);
+          }
         }
+      } else {
+        throw new Error(`No 'homeassistant' property found on context with keys ${val.keys()}`);
       }
     } else {
       throw new Error(
         'HA constructor requires either a homeassistant object or a context object, was passed this instead: ' +
           JSON.stringify(Object.keys(val))
       );
-    }
-    // @ts-ignore
-    if (!isHomeAssistant(this._ha)) {
-      throw new Error('HA construction failed');
     }
   }
 
