@@ -1,6 +1,6 @@
 {
   "name": "@epdoc/node-red-hautil",
-  "version": "1.2.9",
+  "version": "1.2.10",
   "description": "General Purpose Node-RED utils for Home Assistant",
   "private": false,
   "main": "dist/src/index.js",
@@ -44,6 +44,6 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "@epdoc/typeutil": "^1.0.9"
+    "@epdoc/typeutil": "^1.1.0"
   }
 }
