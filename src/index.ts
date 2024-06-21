@@ -1,4 +1,5 @@
 import { Dict } from '@epdoc/typeutil';
+import pkg from '../package.json';
 import { NodeContextGlobalData } from './types';
 
 export * from './function-node-base';
@@ -7,8 +8,24 @@ export * from './mocks';
 export * from './services';
 export * from './types';
 
+export function version(): string {
+  return pkg.version;
+}
+
+export const hautils = {
+  name: () => {
+    return pkg.name;
+  },
+  version: () => {
+    return pkg.version;
+  },
+  description: () => {
+    return pkg.description;
+  }
+};
+
 /**
- * An initialization function to call once when Node-RED has loaded.
+ * An initialization helper function to call once when Node-RED has loaded.
  * @param global The global object.
  * @param modules A dictionary of modules to load.
  */
