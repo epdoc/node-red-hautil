@@ -1,11 +1,11 @@
 import pkg from '../package.json';
-import { hautils } from '../src';
+import { hautilInfo } from '../src';
 
 describe('load', () => {
   it('version', () => {
-    expect(hautils).toBeDefined();
-    expect(hautils.version()).toEqual(pkg.version);
-    expect(hautils.name()).toEqual(pkg.name);
-    expect(hautils.description()).toEqual(pkg.description);
+    expect(hautilInfo).toBeDefined();
+    expect(hautilInfo.version()).toEqual(pkg.version);
+    expect(hautilInfo.name()).toEqual(pkg.name);
+    expect(hautilInfo.description()).toEqual(pkg.description);
   });
 });

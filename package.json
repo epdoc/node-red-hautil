@@ -1,6 +1,6 @@
 {
   "name": "@epdoc/node-red-hautil",
-  "version": "1.2.15",
+  "version": "1.2.16",
   "description": "General Purpose Node-RED utils for Home Assistant",
   "private": false,
   "main": "dist/src/index.js",
